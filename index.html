@@ -130,7 +130,7 @@
         </div>
     </div>
 
-    <!-- Header / Navbar with Logo Integration -->
+    <!-- Header / Navbar with Logo Integration & Firebase Sync Status -->
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
             
@@ -154,6 +154,7 @@
                 <div>
                     <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                         WME Projects Lead Generator
+                        <span id="sync-status" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-medium">Live Cloud Sync Active</span>
                     </h1>
                     <p class="text-xs text-sky-400">Water Treatment Lead Generator & CRM Dashboard</p>
                 </div>
@@ -662,9 +663,29 @@
 
     </main>
 
-    <script>
-        // UNIFIED MASTER STORAGE KEY WITH EXACT CSV LEADS INTEGRATED
-        const STORAGE_KEY = 'wme_projects_master_leads_v12';
+    <!-- FIREBASE REALTIME DATABASE SYNC & APP CONTROLLER -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyASEFR8b4EAJUJbHrAE_NWg9rmmfkW7A1A",
+            authDomain: "wme-projects-crm.firebaseapp.com",
+            databaseURL: "https://wme-projects-crm-default-rtdb.firebaseio.com",
+            projectId: "wme-projects-crm",
+            storageBucket: "wme-projects-crm.firebasestorage.app",
+            messagingSenderId: "1098842258085",
+            appId: "1:1098842258085:web:b4dfc6addbf92b16f52b4c",
+            measurementId: "G-1FNGJS260V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const leadsRef = ref(db, 'leads');
+
+        let leads = [];
+        let categoryChart, pipelineChart;
 
         const initialSampleLeads = [
             {
@@ -890,107 +911,51 @@
             }
         ];
 
-        let storedLeads = localStorage.getItem(STORAGE_KEY);
-        let leads = storedLeads ? JSON.parse(storedLeads) : [];
-
-        if (!Array.isArray(leads) || leads.length === 0) {
-            leads = JSON.parse(JSON.stringify(initialSampleLeads));
-            saveLeadsToStorage();
-        }
-
-        function saveLeadsToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
-        }
-
-        function resetToDefaultLeads() {
-            if (confirm("Reset database back to the official SA target leads (including Mediclinic Head Office & Balwin)?")) {
+        // Listen for Realtime Database updates from Firebase
+        onValue(leadsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Convert Firebase object map to array
+                leads = Object.entries(data).map(([firebaseKey, leadVal]) => ({
+                    ...leadVal,
+                    firebaseKey
+                }));
+            } else {
+                // If database is empty, seed initial sample leads
                 leads = JSON.parse(JSON.stringify(initialSampleLeads));
-                saveLeadsToStorage();
-                updateDashboardMetrics();
-                renderLeadsTable();
+                leads.forEach(l => {
+                    const newRef = push(leadsRef);
+                    set(newRef, l);
+                });
             }
-        }
-
-        let categoryChart, pipelineChart;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            initCharts();
             updateDashboardMetrics();
             renderLeadsTable();
-            calculateROI();
+        }, (error) => {
+            document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Sync Error`;
         });
 
-        function switchTab(tabId) {
+        // Expose functions globally for HTML inline event handlers
+        window.switchTab = function(tabId) {
             ['dashboard', 'generator', 'add-lead', 'leads-list', 'roi-calc', 'knowledge'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
                 document.getElementById(`tab-${t}`).classList.remove('active-tab');
             });
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
             document.getElementById(`tab-${tabId}`).classList.add('active-tab');
-        }
+        };
 
-        function initCharts() {
-            const ctxCat = document.getElementById('categoryChart').getContext('2d');
-            categoryChart = new Chart(ctxCat, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Greywater', 'Borehole', 'Mining', 'Ground / Surface Water'],
-                    datasets: [{
-                        data: [0, 0, 0, 0],
-                        backgroundColor: ['#0d9488', '#4f46e5', '#d97706', '#0284c7']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+        window.resetToDefaultLeads = function() {
+            if (confirm("Reset database back to the official SA target leads (including Mediclinic Head Office & Balwin)?")) {
+                set(leadsRef, null).then(() => {
+                    initialSampleLeads.forEach(l => {
+                        const newRef = push(leadsRef);
+                        set(newRef, l);
+                    });
+                });
+            }
+        };
 
-            const ctxPipe = document.getElementById('pipelineChart').getContext('2d');
-            pipelineChart = new Chart(ctxPipe, {
-                type: 'bar',
-                data: {
-                    labels: ['New', 'Initial Contact', 'Qualified Lead', 'Proposal Sent', 'Closed Won'],
-                    datasets: [{
-                        label: 'Pipeline Value (ZAR)',
-                        data: [0, 0, 0, 0, 0],
-                        backgroundColor: ['#0284c7', '#64748b', '#d97706', '#4f46e5', '#10b981']
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: function(value) {
-                                    return 'R' + (value / 1000000).toFixed(1) + 'M';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function calculateLeadMetrics(category, volume, urgency) {
-            let baseValPerM3 = category === 'Mining' ? 10500 : category === 'Greywater' ? 12000 : category === 'Borehole' ? 11500 : 12500;
-            let estimatedValue = volume * baseValPerM3;
-
-            let score = 50;
-            if (volume > 200) score += 25;
-            else if (volume > 50) score += 15;
-
-            if (urgency.includes('Immediate')) score += 20;
-            else if (urgency.includes('1-3')) score += 10;
-
-            if (category === 'Mining' || category === 'Ground / Surface Water' || category === 'Greywater') score += 5;
-
-            return { value: estimatedValue, score: Math.min(score, 99) };
-        }
-
-        function submitNewLead(e) {
+        window.submitNewLead = function(e) {
             e.preventDefault();
             const company = document.getElementById('form-company').value;
             const contact = document.getElementById('form-contact').value;
@@ -1014,22 +979,24 @@
                 stage: 'New'
             };
 
-            leads.push(newLead);
-            saveLeadsToStorage();
+            const newRef = push(leadsRef);
+            set(newRef, newLead);
 
             document.getElementById('lead-form').reset();
             document.getElementById('form-qualification').value = 'Interested made contact (follow up)';
             document.getElementById('form-process-status').value = 'In process';
-            updateDashboardMetrics();
-            renderLeadsTable();
             switchTab('leads-list');
-            alert(`Lead saved permanently! Priority Score: ${metrics.score}/100`);
-        }
+            alert(`Lead saved & synced to cloud! Priority Score: ${metrics.score}/100`);
+        };
 
-        function renderLeadsTable() {
+        window.renderLeadsTable = function() {
             const tbody = document.getElementById('leads-table-body');
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const catFilter = document.getElementById('filter-category').value;
+            const searchInput = document.getElementById('search-input');
+            const filterCat = document.getElementById('filter-category');
+            if (!tbody || !searchInput || !filterCat) return;
+
+            const search = searchInput.value.toLowerCase();
+            const catFilter = filterCat.value;
 
             const filtered = leads.filter(l => {
                 const matchesSearch = l.company.toLowerCase().includes(search) || 
@@ -1043,6 +1010,7 @@
                 const qual = l.qualification || 'New lead';
                 const proc = l.processStatus || 'In process';
                 const issueText = l.issue || 'N/A';
+                const key = l.firebaseKey || l.id;
                 return `
                 <tr class="hover:bg-slate-50 border-b border-slate-200">
                     <td class="p-3">
@@ -1058,7 +1026,7 @@
                         }">${l.category}</span>
                     </td>
                     <td class="p-3 font-medium">${l.volume} m³/day</td>
-                    <td class="p-3 font-bold text-slate-800">R${l.value.toLocaleString()}</td>
+                    <td class="p-3 font-bold text-slate-800">R${(l.value || 0).toLocaleString()}</td>
                     <td class="p-3 font-bold ${l.score >= 80 ? 'text-amber-600' : 'text-slate-600'}">${l.score}/100</td>
                     <td class="p-3">
                         <span class="inline-block bg-slate-100 text-slate-800 text-xs px-2.5 py-1 rounded-md border border-slate-200 font-medium">
@@ -1066,7 +1034,7 @@
                         </span>
                     </td>
                     <td class="p-3">
-                        <select onchange="updateStage(${l.id}, this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium">
+                        <select onchange="updateStage('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium">
                             <option value="New" ${l.stage === 'New' ? 'selected' : ''}>New</option>
                             <option value="Initial Contact" ${l.stage === 'Initial Contact' ? 'selected' : ''}>Initial Contact</option>
                             <option value="Qualified Lead" ${l.stage === 'Qualified Lead' ? 'selected' : ''}>Qualified Lead</option>
@@ -1075,7 +1043,7 @@
                         </select>
                     </td>
                     <td class="p-3">
-                        <select onchange="updateQualification(${l.id}, this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
+                        <select onchange="updateQualification('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
                             qual === 'New lead' ? 'text-blue-700 bg-blue-50 border-blue-200' :
                             qual === 'Deal won' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
                             qual === 'Deal lost' ? 'text-rose-700 bg-rose-50 border-rose-200' :
@@ -1092,7 +1060,7 @@
                         </select>
                     </td>
                     <td class="p-3">
-                        <select onchange="updateProcessStatus(${l.id}, this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
+                        <select onchange="updateProcessStatus('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
                             proc === 'In process' ? 'text-sky-700 bg-sky-50 border-sky-200' :
                             proc === 'Pending' ? 'text-amber-700 bg-amber-50 border-amber-200' :
                             proc === 'On hold' ? 'text-slate-600 bg-slate-100 border-slate-200' :
@@ -1106,52 +1074,50 @@
                     </td>
                     <td class="p-3 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            <button onclick="openEditModal(${l.id})" class="text-sky-600 hover:text-sky-800 text-xs font-semibold">Edit Contact</button>
-                            <button onclick="deleteLead(${l.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold">Delete</button>
+                            <button onclick="openEditModal('${key}')" class="text-sky-600 hover:text-sky-800 text-xs font-semibold">Edit Contact</button>
+                            <button onclick="deleteLead('${key}')" class="text-red-500 hover:text-red-700 text-xs font-semibold">Delete</button>
                         </div>
                     </td>
                 </tr>
             `}).join('');
 
-            document.getElementById('lead-count-badge').innerText = leads.length;
+            const badge = document.getElementById('lead-count-badge');
+            if (badge) badge.innerText = leads.length;
             lucide.createIcons();
-        }
+        };
 
-        // CONTACT EDIT MODAL LOGIC
-        function openEditModal(id) {
-            const lead = leads.find(l => l.id === id);
+        window.openEditModal = function(key) {
+            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
             if (!lead) return;
-            document.getElementById('edit-lead-id').value = lead.id;
+            document.getElementById('edit-lead-id').value = key;
             document.getElementById('edit-company').value = lead.company || '';
             document.getElementById('edit-contact').value = lead.contact || '';
             document.getElementById('edit-email').value = lead.email || '';
             document.getElementById('edit-phone').value = lead.phone || '';
             document.getElementById('edit-contact-modal').classList.remove('hidden');
             lucide.createIcons();
-        }
+        };
 
-        function closeEditModal() {
+        window.closeEditModal = function() {
             document.getElementById('edit-contact-modal').classList.add('hidden');
-        }
+        };
 
-        function saveContactEdit(e) {
+        window.saveContactEdit = function(e) {
             e.preventDefault();
-            const id = parseInt(document.getElementById('edit-lead-id').value);
-            const lead = leads.find(l => l.id === id);
-            if (lead) {
-                lead.company = document.getElementById('edit-company').value;
-                lead.contact = document.getElementById('edit-contact').value;
-                lead.email = document.getElementById('edit-email').value;
-                lead.phone = document.getElementById('edit-phone').value;
-
-                saveLeadsToStorage();
-                renderLeadsTable();
+            const key = document.getElementById('edit-lead-id').value;
+            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
+            if (lead && lead.firebaseKey) {
+                update(ref(db, `leads/${lead.firebaseKey}`), {
+                    company: document.getElementById('edit-company').value,
+                    contact: document.getElementById('edit-contact').value,
+                    email: document.getElementById('edit-email').value,
+                    phone: document.getElementById('edit-phone').value
+                });
                 closeEditModal();
             }
-        }
+        };
 
-        // MANUAL ADD LEAD MODAL LOGIC
-        function openManualAddModal() {
+        window.openManualAddModal = function() {
             document.getElementById('man-company').value = '';
             document.getElementById('man-contact').value = '';
             document.getElementById('man-phone').value = '';
@@ -1159,13 +1125,13 @@
             document.getElementById('man-volume').value = '450';
             document.getElementById('manual-lead-modal').classList.remove('hidden');
             lucide.createIcons();
-        }
+        };
 
-        function closeManualAddModal() {
+        window.closeManualAddModal = function() {
             document.getElementById('manual-lead-modal').classList.add('hidden');
-        }
+        };
 
-        function saveManualLead(e) {
+        window.saveManualLead = function(e) {
             e.preventDefault();
             const company = document.getElementById('man-company').value;
             const contact = document.getElementById('man-contact').value;
@@ -1196,80 +1162,42 @@
                 stage
             };
 
-            leads.push(newLead);
-            saveLeadsToStorage();
-            updateDashboardMetrics();
-            renderLeadsTable();
+            const newRef = push(leadsRef);
+            set(newRef, newLead);
             closeManualAddModal();
-            alert(`Lead "${company}" added successfully to pipeline!`);
-        }
+            alert(`Lead "${company}" added successfully to cloud pipeline!`);
+        };
 
-        function updateStage(id, newStage) {
-            const lead = leads.find(l => l.id === id);
-            if(lead) {
-                lead.stage = newStage;
-                saveLeadsToStorage();
-                updateDashboardMetrics();
+        window.updateStage = function(key, newStage) {
+            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
+            if (lead && lead.firebaseKey) {
+                update(ref(db, `leads/${lead.firebaseKey}`), { stage: newStage });
             }
-        }
+        };
 
-        function updateQualification(id, newQualification) {
-            const lead = leads.find(l => l.id === id);
-            if(lead) {
-                lead.qualification = newQualification;
-                saveLeadsToStorage();
-                renderLeadsTable();
+        window.updateQualification = function(key, newQualification) {
+            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
+            if (lead && lead.firebaseKey) {
+                update(ref(db, `leads/${lead.firebaseKey}`), { qualification: newQualification });
             }
-        }
+        };
 
-        function updateProcessStatus(id, newStatus) {
-            const lead = leads.find(l => l.id === id);
-            if(lead) {
-                lead.processStatus = newStatus;
-                saveLeadsToStorage();
-                renderLeadsTable();
+        window.updateProcessStatus = function(key, newStatus) {
+            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
+            if (lead && lead.firebaseKey) {
+                update(ref(db, `leads/${lead.firebaseKey}`), { processStatus: newStatus });
             }
-        }
+        };
 
-        function deleteLead(id) {
-            leads = leads.filter(l => l.id !== id);
-            saveLeadsToStorage();
-            updateDashboardMetrics();
-            renderLeadsTable();
-        }
-
-        function updateDashboardMetrics() {
-            const totalLeads = leads.length;
-            const totalValue = leads.reduce((acc, l) => acc + l.value, 0);
-            const hotLeads = leads.filter(l => l.score >= 80).length;
-            const totalVol = leads.reduce((acc, l) => acc + l.volume, 0);
-
-            document.getElementById('dash-total-leads').innerText = totalLeads;
-            document.getElementById('dash-total-val').innerText = `R${totalValue.toLocaleString()}`;
-            document.getElementById('dash-hot-leads').innerText = hotLeads;
-            document.getElementById('dash-water-volume').innerText = `${totalVol.toLocaleString()} m³/day`;
-
-            const catCounts = [
-                leads.filter(l => l.category === 'Greywater').length,
-                leads.filter(l => l.category === 'Borehole').length,
-                leads.filter(l => l.category === 'Mining').length,
-                leads.filter(l => l.category === 'Ground / Surface Water').length
-            ];
-            if (categoryChart) {
-                categoryChart.data.datasets[0].data = catCounts;
-                categoryChart.update();
+        window.deleteLead = function(key) {
+            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
+            if (lead && lead.firebaseKey && confirm("Are you sure you want to delete this lead?")) {
+                remove(ref(db, `leads/${lead.firebaseKey}`));
             }
-
-            const stages = ['New', 'Initial Contact', 'Qualified Lead', 'Proposal Sent', 'Closed Won'];
-            const stageValues = stages.map(st => leads.filter(l => l.stage === st).reduce((acc, l) => acc + l.value, 0));
-            if (pipelineChart) {
-                pipelineChart.data.datasets[0].data = stageValues;
-                pipelineChart.update();
-            }
-        }
+        };
 
         let tempGenerated = [];
-        function runLeadGenerator() {
+        window.runLeadGenerator = function() {
             const cat = document.getElementById('gen-category').value;
 
             const samples = [
@@ -1294,12 +1222,12 @@
             `).join('');
 
             document.getElementById('generator-results-container').classList.remove('hidden');
-        }
+        };
 
-        function importSingleLead(idx) {
+        window.importSingleLead = function(idx) {
             const item = tempGenerated[idx];
             const metrics = calculateLeadMetrics(item.cat, item.vol, '1-3 Months');
-            leads.push({
+            const newLead = {
                 id: Date.now() + idx,
                 company: item.company,
                 contact: item.contact,
@@ -1315,18 +1243,17 @@
                 value: metrics.value,
                 score: metrics.score,
                 stage: 'Initial Contact'
-            });
-            saveLeadsToStorage();
-            updateDashboardMetrics();
-            renderLeadsTable();
-            alert(`Imported ${item.company} permanently!`);
-        }
+            };
+            const newRef = push(leadsRef);
+            set(newRef, newLead);
+            alert(`Imported ${item.company} to cloud pipeline!`);
+        };
 
-        function addAllGeneratedLeads() {
+        window.addAllGeneratedLeads = function() {
             tempGenerated.forEach((g, idx) => importSingleLead(idx));
-        }
+        };
 
-        function calculateROI() {
+        window.calculateROI = function() {
             const vol = parseFloat(document.getElementById('roi-volume').value) || 0;
             const tariff = parseFloat(document.getElementById('roi-tariff').value) || 0;
             const capex = parseFloat(document.getElementById('roi-capex').value) || 0;
@@ -1340,9 +1267,9 @@
             document.getElementById('calc-gross-savings').innerText = `R${Math.round(grossSavings).toLocaleString()}`;
             document.getElementById('calc-net-savings').innerText = `R${Math.round(netSavings).toLocaleString()}`;
             document.getElementById('calc-payback').innerText = paybackMonths > 0 ? `${paybackMonths.toFixed(1)} Months` : 'N/A';
-        }
+        };
 
-        function exportToCSV() {
+        window.exportToCSV = function() {
             let csv = 'Company,Contact,Email,Phone,Category,Volume (m3/day),Est Value (ZAR),Score,Primary Issue,Stage,Qualification Status,Process Status\n';
             leads.forEach(l => {
                 const qual = l.qualification || 'New lead';
@@ -1356,9 +1283,9 @@
             a.setAttribute('href', url);
             a.setAttribute('download', 'WME_Projects_Leads_SA.csv');
             a.click();
-        }
+        };
 
-        function filterKB() {
+        window.filterKB = function() {
             const query = document.getElementById('kb-search').value.toLowerCase();
             const cards = document.querySelectorAll('.kb-card');
 
@@ -1370,9 +1297,9 @@
                     card.classList.add('hidden');
                 }
             });
-        }
+        };
 
-        function filterKBCategory(cat) {
+        window.filterKBCategory = function(cat) {
             const cards = document.querySelectorAll('.kb-card');
             const pills = document.querySelectorAll('.kb-pill');
 
@@ -1392,6 +1319,111 @@
                     card.classList.add('hidden');
                 }
             });
+        };
+
+        function calculateLeadMetrics(category, volume, urgency) {
+            let baseValPerM3 = category === 'Mining' ? 10500 : category === 'Greywater' ? 12000 : category === 'Borehole' ? 11500 : 12500;
+            let estimatedValue = volume * baseValPerM3;
+
+            let score = 50;
+            if (volume > 200) score += 25;
+            else if (volume > 50) score += 15;
+
+            if (urgency.includes('Immediate')) score += 20;
+            else if (urgency.includes('1-3')) score += 10;
+
+            if (category === 'Mining' || category === 'Ground / Surface Water' || category === 'Greywater') score += 5;
+
+            return { value: estimatedValue, score: Math.min(score, 99) };
+        }
+
+        function updateDashboardMetrics() {
+            const totalLeads = leads.length;
+            const totalValue = leads.reduce((acc, l) => acc + (l.value || 0), 0);
+            const hotLeads = leads.filter(l => l.score >= 80).length;
+            const totalVol = leads.reduce((acc, l) => acc + (l.volume || 0), 0);
+
+            const elTotal = document.getElementById('dash-total-leads');
+            const elVal = document.getElementById('dash-total-val');
+            const elHot = document.getElementById('dash-hot-leads');
+            const elVol = document.getElementById('dash-water-volume');
+
+            if (elTotal) elTotal.innerText = totalLeads;
+            if (elVal) elVal.innerText = `R${totalValue.toLocaleString()}`;
+            if (elHot) elHot.innerText = hotLeads;
+            if (elVol) elVol.innerText = `${totalVol.toLocaleString()} m³/day`;
+
+            const catCounts = [
+                leads.filter(l => l.category === 'Greywater').length,
+                leads.filter(l => l.category === 'Borehole').length,
+                leads.filter(l => l.category === 'Mining').length,
+                leads.filter(l => l.category === 'Ground / Surface Water').length
+            ];
+            if (categoryChart) {
+                categoryChart.data.datasets[0].data = catCounts;
+                categoryChart.update();
+            }
+
+            const stages = ['New', 'Initial Contact', 'Qualified Lead', 'Proposal Sent', 'Closed Won'];
+            const stageValues = stages.map(st => leads.filter(l => l.stage === st).reduce((acc, l) => acc + (l.value || 0), 0));
+            if (pipelineChart) {
+                pipelineChart.data.datasets[0].data = stageValues;
+                pipelineChart.update();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initCharts();
+            calculateROI();
+        });
+
+        function initCharts() {
+            const ctxCat = document.getElementById('categoryChart')?.getContext('2d');
+            if (ctxCat) {
+                categoryChart = new Chart(ctxCat, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Greywater', 'Borehole', 'Mining', 'Ground / Surface Water'],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: ['#0d9488', '#4f46e5', '#d97706', '#0284c7']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            const ctxPipe = document.getElementById('pipelineChart')?.getContext('2d');
+            if (ctxPipe) {
+                pipelineChart = new Chart(ctxPipe, {
+                    type: 'bar',
+                    data: {
+                        labels: ['New', 'Initial Contact', 'Qualified Lead', 'Proposal Sent', 'Closed Won'],
+                        datasets: [{
+                            label: 'Pipeline Value (ZAR)',
+                            data: [0, 0, 0, 0, 0],
+                            backgroundColor: ['#0284c7', '#64748b', '#d97706', '#4f46e5', '#10b981']
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'R' + (value / 1000000).toFixed(1) + 'M';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         }
     </script>
 </body>
