@@ -22,7 +22,7 @@
 
     <!-- EDIT CONTACT MODAL -->
     <div id="edit-contact-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full border border-slate-200 max-h-[90vh] overflow-y-auto">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full border border-slate-200">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
                     <i data-lucide="user-cog" class="w-5 h-5 text-sky-600"></i> Edit Contact Info
@@ -497,7 +497,7 @@
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Manual Lead
                         </button>
                         <button onclick="resetToDefaultLeads()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium py-2 px-3 rounded-lg flex items-center gap-1">
-                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset All 14 Leads
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Sample Data
                         </button>
                         <button onclick="exportToCSV()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium py-2 px-4 rounded-lg flex items-center gap-2">
                             <i data-lucide="download" class="w-4 h-4"></i> Export to CSV
@@ -719,14 +719,525 @@
         let kbEntries = [];
         let categoryChart, pipelineChart;
 
-        // ALL 14 SOUTH AFRICAN TARGET ENTERPRISE LEADS
         const initialSampleLeads = [
-            { id: 1, company: "Broll Property Group (EWS Division)", contact: "Energy & Water Sustainability Facilities Lead", email: "ews@broll.com", phone: "011 441 4000", category: "Greywater", volume: 650, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "Commercial office park greywater recycling & utility monitoring across Randburg & Sandton portfolio", value: 4800000, score: 89, stage: "Initial Contact", qualification: "Interested made contact (follow up)", processStatus: "In process" },
-            { id: 2, company: "Balwin Properties (Balwin Green Living)", contact: "Steve Brookes (CEO) / Head of Infrastructure", email: "info@balwin.co.za", phone: "+27 (0)11 450 2818", category: "Greywater", volume: 1200, urgency: "Immediate (< 1 month)", issue: "Greywater Reuse & Estate Irrigation", notes: "Greywater recycling & MBR wastewater treatment plants for Mooikloof, The Reid & Greenlee estates", value: 7800000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 3, company: "Mediclinic head office", contact: "Petrus Swanepoel infrastructure Manager", email: "petrus.swanepoel@mediclinic.co.za", phone: "021 809 6500", category: "Greywater", volume: 450, urgency: "Immediate (< 1 month)", issue: "High Municipal Tariffs & Water Shedding", notes: "Head office infrastructure contact for corporate greywater and water security", value: 3250000, score: 91, stage: "Initial Contact", qualification: "Interested made contact (follow up)", processStatus: "In process" },
-            { id: 4, company: "Tharisa Minerals (Chrome Washplant)", contact: "Plant Metallurgist & Resident GCC Engineer", email: "enquiries@tharisa.com", phone: "+27 (0)11 996 3500", category: "Mining", volume: 3200, urgency: "Immediate (< 1 month)", issue: "Thickener Overflow & Process Water Clarification", notes: "High-capacity thickener overflow recycling for spiral and DMS washplant circuits", value: 11200000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 5, company: "Samancor Chrome (Tubatse Works)", contact: "General Manager & Processing Operations Lead", email: "info@samancorcr.com", phone: "+27 (0)11 245 1000", category: "Mining", volume: 4500, urgency: "1-3 Months", issue: "Slimes Dam Decant & Ultrafine Chromite Fines", notes: "Slimes dam water recovery and ultrafine chromite filtration system in Steelpoort", value: 15500000, score: 94, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 6, company: "Glencore Ferrochrome (Eastern Complex)", contact: "Metallurgical Manager & Water Infrastructure Director", email: "info@glencore.co.za", phone: "+27 (0)13 235 7000", category: "Mining", volume: 5000, urgency: "Immediate (< 1 month)", issue: "Acid Mine Drainage & High Sulphates", notes: "Closed-loop process water treatment and heavy metal precipitation for chrome smelting", value: 18000000, score: 97, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 7, company: "Hernic Ferrochrome (Brits Washplant)", contact: "Senior Plant Metallurgist & GCC Engineer", email: "info@hernic.co.za", phone: "+27 (0)12 252 8000", category: "Mining", volume: 2800, urgency: "1-3 Months", issue: "Thickener Overflow & Process Water Clarification", notes: "DMS washplant water clarification and tailings thickener optimisation", value: 9500000, score: 90, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 8, company: "Jubilee Metals Group (Dilokong Chrome)", contact: "Head of Tailings Retreatment & Operations", email: "info@jubileemetalsgroup.com", phone: "+27 (0)11 268 6555", category: "Mining", volume: 3800, urgency: "Immediate (< 1 month)", issue: "Slimes Dam Decant & Ultrafine Chromite Fines", notes: "Surface tailings retreatment and ultrafiltration water recirculation", value: 13200000, score: 93, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 9, company: "Sibanye-Stillwater (Westonaria Ops)", contact: "Dr. Richard Stewart (CEO) / Operational Technical Lead", email: "richard.stewart@sibanyestillwater.com", phone: "+27 (0)11 278 9600", category: "Mining", volume: 3500, urgency: "Immediate (< 1 month)", issue: "Acid Mine Drainage & High Sulphates", notes: "Underground dewatering & high-recovery neutralization plant", value: 12500000, score: 95, stage:
+            { id: 1, company: "Balwin Properties (Balwin Green Living)", contact: "Steve Brookes (CEO) / Head of Infrastructure", email: "info@balwin.co.za", phone: "+27 (0)11 450 2818", category: "Greywater", volume: 1200, urgency: "Immediate (< 1 month)", issue: "Greywater Reuse & Estate Irrigation", notes: "Greywater recycling & MBR wastewater treatment plants for Mooikloof, The Reid & Greenlee estates", value: 7800000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 2, company: "Mediclinic head office", contact: "Petrus Swanepoel infrastructure Manager", email: "petrus.swanepoel@mediclinic.co.za", phone: "021 809 6500", category: "Greywater", volume: 450, urgency: "Immediate (< 1 month)", issue: "High Municipal Tariffs & Water Shedding", notes: "Head office infrastructure contact for corporate greywater and water security", value: 3250000, score: 91, stage: "Initial Contact", qualification: "Interested made contact (follow up)", processStatus: "In process" },
+            { id: 3, company: "Tharisa Minerals (Chrome Washplant)", contact: "Plant Metallurgist & Resident GCC Engineer", email: "enquiries@tharisa.com", phone: "+27 (0)11 996 3500", category: "Mining", volume: 3200, urgency: "Immediate (< 1 month)", issue: "Thickener Overflow & Process Water Clarification", notes: "High-capacity thickener overflow recycling for spiral and DMS washplant circuits", value: 11200000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 4, company: "Samancor Chrome (Tubatse Works)", contact: "General Manager & Processing Operations Lead", email: "info@samancorcr.com", phone: "+27 (0)11 245 1000", category: "Mining", volume: 4500, urgency: "1-3 Months", issue: "Slimes Dam Decant & Ultrafine Chromite Fines", notes: "Slimes dam water recovery and ultrafine chromite filtration system in Steelpoort", value: 15500000, score: 94, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 5, company: "Glencore Ferrochrome (Eastern Complex)", contact: "Metallurgical Manager & Water Infrastructure Director", email: "info@glencore.co.za", phone: "+27 (0)13 235 7000", category: "Mining", volume: 5000, urgency: "Immediate (< 1 month)", issue: "Acid Mine Drainage & High Sulphates", notes: "Closed-loop process water treatment and heavy metal precipitation for chrome smelting", value: 18000000, score: 97, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 6, company: "Hernic Ferrochrome (Brits Washplant)", contact: "Senior Plant Metallurgist & GCC Engineer", email: "info@hernic.co.za", phone: "+27 (0)12 252 8000", category: "Mining", volume: 2800, urgency: "1-3 Months", issue: "Thickener Overflow & Process Water Clarification", notes: "DMS washplant water clarification and tailings thickener optimisation", value: 9500000, score: 90, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 7, company: "Jubilee Metals Group (Dilokong Chrome)", contact: "Head of Tailings Retreatment & Operations", email: "info@jubileemetalsgroup.com", phone: "+27 (0)11 268 6555", category: "Mining", volume: 3800, urgency: "Immediate (< 1 month)", issue: "Slimes Dam Decant & Ultrafine Chromite Fines", notes: "Surface tailings retreatment and ultrafiltration water recirculation", value: 13200000, score: 93, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 8, company: "Sibanye-Stillwater (Westonaria Ops)", contact: "Dr. Richard Stewart (CEO) / Operational Technical Lead", email: "richard.stewart@sibanyestillwater.com", phone: "+27 (0)11 278 9600", category: "Mining", volume: 3500, urgency: "Immediate (< 1 month)", issue: "Acid Mine Drainage & High Sulphates", notes: "Underground dewatering & high-recovery neutralization plant", value: 12500000, score: 95, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 9, company: "Netcare Sunninghill Hospital", contact: "Hospital Management & Regional Facilities Engineer", email: "customer.care@netcare.co.za", phone: "+27 (0)11 806 1500", category: "Greywater", volume: 450, urgency: "Immediate (< 1 month)", issue: "Greywater Reuse & Estate Irrigation", notes: "SANS 241 & ISO 13959 high-purity medical RO for hemodialysis and backup", value: 2800000, score: 92, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 10, company: "Mall of Africa (Attacq Ltd)", contact: "Jackie van Niekerk (CEO) / Precinct Facilities Manager", email: "enquiries@attacq.co.za", phone: "+27 (0)10 596 1470", category: "Greywater", volume: 850, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "HVAC cooling tower makeup water, bio-fouling control and greywater harvesting", value: 4200000, score: 85, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 11, company: "Montecasino Complex (Tsogo Sun)", contact: "Director of Property Operations & Technical Infrastructure", email: "montecasino.contact@tsogosun.com", phone: "+27 (0)11 510 7000", category: "Greywater", volume: 650, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "Blackwater reclamation & greywater treatment for cooling towers and fountains", value: 3900000, score: 82, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 12, company: "Rand Water (Vaal Intake Operations)", contact: "Sipho Mosai (CEO) / Bulk Water Operations Director", email: "customerservice@randwater.co.za", phone: "+27 (0)11 682 0911", category: "Ground / Surface Water", volume: 15000, urgency: "Immediate (< 1 month)", issue: "Surface Water River Intake Turbidity & Algae", notes: "High-turbidity Vaal River surface water intake, PAC dosing, UF multi-barrier", value: 45000000, score: 98, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 13, company: "Heineken SA (Sedibeng Brewery)", contact: "Brewery Supply Chain Director & Plant Utilities Manager", email: "info.southafrica@heineken.com", phone: "+27 (0)86 044 8377", category: "Borehole", volume: 950, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "Industrial deep borehole brackish RO desalination & softening for boiler feed", value: 6200000, score: 87, stage: "New", qualification: "New lead", processStatus: "In process" }
+        ];
+
+        // Realtime Listener for Pipeline Leads
+        onValue(leadsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                leads = Object.entries(data).map(([firebaseKey, leadVal]) => ({ ...leadVal, firebaseKey }));
+            } else {
+                const localSaved = localStorage.getItem('wme_projects_master_leads_v12');
+                const seedData = localSaved ? JSON.parse(localSaved) : initialSampleLeads;
+                leads = [];
+                seedData.forEach(l => {
+                    const newRef = push(leadsRef);
+                    set(newRef, l);
+                    leads.push({ ...l, firebaseKey: newRef.key });
+                });
+            }
+            updateDashboardMetrics();
+            renderLeadsTable();
+        }, (error) => {
+            document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Sync Error`;
+        });
+
+        // Realtime Listener for Knowledge Base Entries
+        onValue(kbRef, (snapshot) => {
+            const data = snapshot.val();
+            kbEntries = data ? Object.entries(data).map(([firebaseKey, val]) => ({ ...val, firebaseKey })) : [];
+            renderCustomKbCards();
+        });
+
+        window.switchTab = function(tabId) {
+            ['dashboard', 'generator', 'add-lead', 'leads-list', 'roi-calc', 'knowledge'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('active-tab');
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('active-tab');
+        };
+
+        window.resetToDefaultLeads = function() {
+            if (confirm("Reset database back to the official SA target leads (including Mediclinic Head Office & Balwin)?")) {
+                set(leadsRef, null).then(() => {
+                    initialSampleLeads.forEach(l => {
+                        const newRef = push(leadsRef);
+                        set(newRef, l);
+                    });
+                });
+            }
+        };
+
+        window.submitNewLead = function(e) {
+            e.preventDefault();
+            const vol = parseFloat(document.getElementById('form-volume').value) || 100;
+            const newLead = {
+                id: Date.now(),
+                company: document.getElementById('form-company').value,
+                contact: document.getElementById('form-contact').value,
+                email: document.getElementById('form-email').value,
+                phone: document.getElementById('form-phone').value,
+                category: document.getElementById('form-category').value,
+                volume: vol,
+                urgency: document.getElementById('form-urgency').value,
+                qualification: document.getElementById('form-qualification').value,
+                processStatus: document.getElementById('form-process-status').value,
+                issue: document.getElementById('form-issue').value,
+                notes: document.getElementById('form-notes').value,
+                value: vol * 12000,
+                score: 85,
+                stage: 'New'
+            };
+            const newRef = push(leadsRef);
+            set(newRef, newLead);
+            document.getElementById('lead-form').reset();
+            switchTab('leads-list');
+            alert('Lead saved and synced to cloud!');
+        };
+
+        window.renderLeadsTable = function() {
+            const tbody = document.getElementById('leads-table-body');
+            const searchInput = document.getElementById('search-input');
+            const filterCat = document.getElementById('filter-category');
+            if (!tbody || !searchInput || !filterCat) return;
+
+            const search = searchInput.value.toLowerCase();
+            const catFilter = filterCat.value;
+
+            const filtered = leads.filter(l => {
+                const matchesSearch = l.company.toLowerCase().includes(search) || 
+                                      l.contact.toLowerCase().includes(search) ||
+                                      (l.issue && l.issue.toLowerCase().includes(search));
+                const matchesCat = catFilter === 'All' || l.category === catFilter;
+                return matchesSearch && matchesCat;
+            });
+
+            tbody.innerHTML = filtered.map(l => {
+                const qual = l.qualification || 'New lead';
+                const proc = l.processStatus || 'In process';
+                const issueText = l.issue || 'N/A';
+                const key = l.firebaseKey || l.id;
+                return `
+                <tr class="hover:bg-slate-50 border-b border-slate-200">
+                    <td class="p-3">
+                        <div class="font-bold text-slate-900">${l.company}</div>
+                        <div class="text-xs text-slate-500">${l.contact} • ${l.phone}</div>
+                        <div class="text-[11px] text-sky-600">${l.email}</div>
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${
+                            l.category === 'Greywater' ? 'bg-teal-100 text-teal-800' :
+                            l.category === 'Borehole' ? 'bg-indigo-100 text-indigo-800' : 
+                            l.category === 'Mining' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'
+                        }">${l.category}</span>
+                    </td>
+                    <td class="p-3 font-medium">${l.volume} m³/day</td>
+                    <td class="p-3 font-bold text-slate-800">R${(l.value || 0).toLocaleString()}</td>
+                    <td class="p-3 font-bold ${l.score >= 80 ? 'text-amber-600' : 'text-slate-600'}">${l.score}/100</td>
+                    <td class="p-3">
+                        <span class="inline-block bg-slate-100 text-slate-800 text-xs px-2.5 py-1 rounded-md border border-slate-200 font-medium">
+                            ${issueText}
+                        </span>
+                    </td>
+                    <td class="p-3">
+                        <select onchange="updateStage('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium">
+                            <option value="New" ${l.stage === 'New' ? 'selected' : ''}>New</option>
+                            <option value="Initial Contact" ${l.stage === 'Initial Contact' ? 'selected' : ''}>Initial Contact</option>
+                            <option value="Qualified Lead" ${l.stage === 'Qualified Lead' ? 'selected' : ''}>Qualified Lead</option>
+                            <option value="Proposal Sent" ${l.stage === 'Proposal Sent' ? 'selected' : ''}>Proposal Sent</option>
+                            <option value="Closed Won" ${l.stage === 'Closed Won' ? 'selected' : ''}>Closed Won</option>
+                        </select>
+                    </td>
+                    <td class="p-3">
+                        <select onchange="updateQualification('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
+                            qual === 'New lead' ? 'text-blue-700 bg-blue-50 border-blue-200' :
+                            qual === 'Deal won' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
+                            qual === 'Deal lost' ? 'text-rose-700 bg-rose-50 border-rose-200' :
+                            qual === 'Not interested' ? 'text-slate-500 bg-slate-100 border-slate-200' :
+                            qual === 'In contract (revisit 1 year)' ? 'text-amber-700 bg-amber-50 border-amber-200' :
+                            'text-sky-700 bg-sky-50 border-sky-200'
+                        }">
+                            <option value="New lead" ${qual === 'New lead' ? 'selected' : ''}>New lead</option>
+                            <option value="Interested made contact (follow up)" ${qual === 'Interested made contact (follow up)' ? 'selected' : ''}>Interested made contact (follow up)</option>
+                            <option value="In contract (revisit 1 year)" ${qual === 'In contract (revisit 1 year)' ? 'selected' : ''}>In contract (revisit 1 year)</option>
+                            <option value="Not interested" ${qual === 'Not interested' ? 'selected' : ''}>Not interested</option>
+                            <option value="Deal won" ${qual === 'Deal won' ? 'selected' : ''}>Deal won</option>
+                            <option value="Deal lost" ${qual === 'Deal lost' ? 'selected' : ''}>Deal lost</option>
+                        </select>
+                    </td>
+                    <td class="p-3">
+                        <select onchange="updateProcessStatus('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
+                            proc === 'In process' ? 'text-sky-700 bg-sky-50 border-sky-200' :
+                            proc === 'Pending' ? 'text-amber-700 bg-amber-50 border-amber-200' :
+                            proc === 'On hold' ? 'text-slate-600 bg-slate-100 border-slate-200' :
+                            'text-emerald-700 bg-emerald-50 border-emerald-200'
+                        }">
+                            <option value="In process" ${proc === 'In process' ? 'selected' : ''}>In process</option>
+                            <option value="Pending" ${proc === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="On hold" ${proc === 'On hold' ? 'selected' : ''}>On hold</option>
+                            <option value="Completed" ${proc === 'Completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </td>
+                    <td class="p-3 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <button onclick="openEditModal('${key}')" class="text-sky-600 hover:text-sky-800 text-xs font-semibold">Edit</button>
+                            <button onclick="deleteLead('${key}')" class="text-red-500 hover:text-red-700 text-xs font-semibold">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `}).join('');
+
+            document.getElementById('lead-count-badge').innerText = leads.length;
+            lucide.createIcons();
+        };
+
+        window.openEditModal = function(key) {
+            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
+            if (!lead) return;
+            document.getElementById('edit-lead-id').value = key;
+            document.getElementById('edit-company').value = lead.company || '';
+            document.getElementById('edit-contact').value = lead.contact || '';
+            document.getElementById('edit-category').value = lead.category || 'Greywater';
+            document.getElementById('edit-volume').value = lead.volume || 100;
+            document.getElementById('edit-value').value = lead.value || 500000;
+            document.getElementById('edit-score').value = lead.score || 75;
+            document.getElementById('edit-email').value = lead.email || '';
+            document.getElementById('edit-phone').value = lead.phone || '';
+            document.getElementById('edit-contact-modal').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeEditModal = function() {
+            document.getElementById('edit-contact-modal').classList.add('hidden');
+        };
+
+        window.saveContactEdit = function(e) {
+            e.preventDefault();
+            const key = document.getElementById('edit-lead-id').value;
+            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
+            if (lead && lead.firebaseKey) {
+                update(ref(db, `leads/${lead.firebaseKey}`), {
+                    company: document.getElementById('edit-company').value,
+                    contact: document.getElementById('edit-contact').value,
+                    category: document.getElementById('edit-category').value,
+                    volume: parseFloat(document.getElementById('edit-volume').value) || 0,
+                    value: parseFloat(document.getElementById('edit-value').value) || 0,
+                    score: parseInt(document.getElementById('edit-score').value) || 50,
+                    email: document.getElementById('edit-email').value,
+                    phone: document.getElementById('edit-phone').value
+                });
+                closeEditModal();
+            }
+        };
+
+        window.openManualAddModal = function() {
+            document.getElementById('man-company').value = '';
+            document.getElementById('man-contact').value = '';
+            document.getElementById('man-phone').value = '';
+            document.getElementById('man-email').value = '';
+            document.getElementById('man-volume').value = '450';
+            document.getElementById('manual-lead-modal').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeManualAddModal = function() {
+            document.getElementById('manual-lead-modal').classList.add('hidden');
+        };
+
+        window.saveManualLead = function(e) {
+            e.preventDefault();
+            const company = document.getElementById('man-company').value;
+            const contact = document.getElementById('man-contact').value;
+            const phone = document.getElementById('man-phone').value;
+            const email = document.getElementById('man-email').value;
+            const category = document.getElementById('man-category').value;
+            const volume = parseFloat(document.getElementById('man-volume').value) || 250;
+            const stage = document.getElementById('man-stage').value;
+            const issue = document.getElementById('man-issue').value;
+
+            const newLead = {
+                id: Date.now(),
+                company,
+                contact,
+                email: email || 'info@' + company.toLowerCase().replace(/[^a-z]/g, '') + '.co.za',
+                phone: phone || '+27 11 ' + Math.floor(1000000 + Math.random() * 9000000),
+                category,
+                volume,
+                urgency: '1-3 Months',
+                qualification: 'Interested made contact (follow up)',
+                processStatus: 'In process',
+                issue,
+                notes: 'Manually added lead',
+                value: volume * 12000,
+                score: 85,
+                stage
+            };
+
+            const newRef = push(leadsRef);
+            set(newRef, newLead);
+            closeManualAddModal();
+            alert(`Lead "${company}" saved to cloud!`);
+        };
+
+        window.openKbModal = function() {
+            document.getElementById('kb-company').value = '';
+            document.getElementById('kb-metrics').value = '';
+            document.getElementById('kb-contact').value = '';
+            document.getElementById('kb-overview').value = '';
+            document.getElementById('manual-kb-modal').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeKbModal = function() {
+            document.getElementById('manual-kb-modal').classList.add('hidden');
+        };
+
+        window.saveKbEntry = function(e) {
+            e.preventDefault();
+            const newKb = {
+                company: document.getElementById('kb-company').value,
+                category: document.getElementById('kb-category').value,
+                metrics: document.getElementById('kb-metrics').value,
+                contact: document.getElementById('kb-contact').value,
+                overview: document.getElementById('kb-overview').value,
+                createdAt: new Date().toISOString()
+            };
+            const newRef = push(kbRef);
+            set(newRef, newKb);
+            closeKbModal();
+        };
+
+        window.deleteKbEntry = function(key) {
+            if (confirm("Remove this entry from Knowledge Base?")) {
+                remove(ref(db, `knowledge_base/${key}`));
+            }
+        };
+
+        function renderCustomKbCards() {
+            const grid = document.getElementById('kb-card-grid');
+            const existingDynamic = grid.querySelectorAll('.dynamic-kb');
+            existingDynamic.forEach(el => el.remove());
+
+            kbEntries.forEach(kb => {
+                const card = document.createElement('div');
+                card.className = "kb-card dynamic-kb border border-sky-300 bg-sky-50/60 rounded-xl p-5 hover:shadow-md transition space-y-2";
+                card.setAttribute('data-category', kb.category || 'All');
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-sky-900 text-sm">${escapeHtml(kb.company)}</h3>
+                        <button onclick="deleteKbEntry('${kb.firebaseKey}')" class="text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="text-xs space-y-1 text-slate-800">
+                        <p><strong>Scale & Footprint:</strong> ${escapeHtml(kb.metrics || 'N/A')}</p>
+                        <p><strong>Key Contacts:</strong> ${escapeHtml(kb.contact || 'N/A')}</p>
+                        <p class="text-slate-700 mt-1">${escapeHtml(kb.overview || '')}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        window.updateStage = function(key, newStage) {
+            const lead = leads.find(l => l.firebaseKey === key || l.id == key);
+            if (lead && lead.firebaseKey) update(ref(db, `leads/${lead.firebaseKey}`), { stage: newStage });
+        };
+
+        window.updateQualification = function(key, newQualification) {
+            const lead = leads.find(l => l.firebaseKey === key || l.id == key);
+            if (lead && lead.firebaseKey) update(ref(db, `leads/${lead.firebaseKey}`), { qualification: newQualification });
+        };
+
+        window.updateProcessStatus = function(key, newStatus) {
+            const lead = leads.find(l => l.firebaseKey === key || l.id == key);
+            if (lead && lead.firebaseKey) update(ref(db, `leads/${lead.firebaseKey}`), { processStatus: newStatus });
+        };
+
+        window.deleteLead = function(key) {
+            const lead = leads.find(l => l.firebaseKey === key || l.id == key);
+            if (lead && lead.firebaseKey && confirm("Delete this lead?")) remove(ref(db, `leads/${lead.firebaseKey}`));
+        };
+
+        let tempGenerated = [];
+        window.runLeadGenerator = function() {
+            const cat = document.getElementById('gen-category').value;
+            const samples = [
+                { company: "Balwin Properties (Balwin Green Living)", cat: "Greywater", vol: 1200, contact: "Steve Brookes (CEO)", issue: "Greywater Reuse & Estate Irrigation" },
+                { company: "Mediclinic head office", cat: "Greywater", vol: 450, contact: "Petrus Swanepoel infrastructure Manager", issue: "High Municipal Tariffs & Water Shedding" },
+                { company: "Tharisa Minerals (Chrome Washplant)", cat: "Mining", vol: 3200, contact: "Plant Metallurgist", issue: "Thickener Overflow & Process Water Clarification" },
+                { company: "Samancor Chrome (Tubatse Works)", cat: "Mining", vol: 4500, contact: "General Manager", issue: "Slimes Dam Decant & Ultrafine Chromite Fines" },
+                { company: "Glencore Ferrochrome (Eastern Complex)", cat: "Mining", vol: 5000, contact: "Metallurgical Manager", issue: "Acid Mine Drainage & High Sulphates" }
+            ];
+            tempGenerated = samples.filter(s => cat === 'All' || s.cat === cat);
+            const container = document.getElementById('generated-leads-list');
+            container.innerHTML = tempGenerated.map((g, idx) => `
+                <div class="p-4 border border-slate-200 rounded-lg bg-slate-50 flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-800 text-sm">${g.company}</div>
+                        <div class="text-xs text-slate-500">${g.cat} • ${g.vol} m³/day</div>
+                    </div>
+                    <button onclick="importSingleLead(${idx})" class="bg-sky-600 text-white text-xs px-3 py-1.5 rounded hover:bg-sky-700">Import</button>
+                </div>
+            `).join('');
+            document.getElementById('generator-results-container').classList.remove('hidden');
+        };
+
+        window.importSingleLead = function(idx) {
+            const item = tempGenerated[idx];
+            const newLead = {
+                id: Date.now() + idx,
+                company: item.company,
+                contact: item.contact,
+                email: "info@" + item.company.toLowerCase().replace(/[^a-z]/g, "") + ".co.za",
+                phone: "+27 11 " + Math.floor(1000000 + Math.random() * 9000000),
+                category: item.cat,
+                volume: item.vol,
+                urgency: "1-3 Months",
+                qualification: "Interested made contact (follow up)",
+                processStatus: "In process",
+                issue: item.issue,
+                notes: "Scraped via Prospector Engine",
+                value: item.vol * 12000,
+                score: 90,
+                stage: 'Initial Contact'
+            };
+            const newRef = push(leadsRef);
+            set(newRef, newLead);
+            alert(`Imported ${item.company} to cloud pipeline!`);
+        };
+
+        window.addAllGeneratedLeads = function() {
+            tempGenerated.forEach((g, idx) => importSingleLead(idx));
+        };
+
+        window.calculateROI = function() {
+            const vol = parseFloat(document.getElementById('roi-volume').value) || 0;
+            const tariff = parseFloat(document.getElementById('roi-tariff').value) || 0;
+            const capex = parseFloat(document.getElementById('roi-capex').value) || 0;
+            const opex = parseFloat(document.getElementById('roi-opex').value) || 0;
+            const annualVol = vol * 365;
+            const gross = annualVol * tariff;
+            const net = annualVol * (tariff - opex);
+            const payback = net > 0 ? (capex / net) * 12 : 0;
+            document.getElementById('calc-gross-savings').innerText = `R${Math.round(gross).toLocaleString()}`;
+            document.getElementById('calc-net-savings').innerText = `R${Math.round(net).toLocaleString()}`;
+            document.getElementById('calc-payback').innerText = payback > 0 ? `${payback.toFixed(1)} Months` : 'N/A';
+        };
+
+        window.exportToCSV = function() {
+            let csv = 'Company,Contact,Phone,Category,Volume,Value,Stage\n';
+            leads.forEach(l => csv += `"${l.company}","${l.contact}","${l.phone}","${l.category}",${l.volume},${l.value},"${l.stage}"\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = 'WME_Leads.csv';
+            a.click();
+        };
+
+        window.filterKB = function() {
+            const query = document.getElementById('kb-search').value.toLowerCase();
+            const cards = document.querySelectorAll('.kb-card');
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(query)) card.classList.remove('hidden');
+                else card.classList.add('hidden');
+            });
+        };
+
+        window.filterKBCategory = function(cat) {
+            const cards = document.querySelectorAll('.kb-card');
+            const pills = document.querySelectorAll('.kb-pill');
+            pills.forEach(p => {
+                if (p.innerText.includes(cat) || (cat === 'All' && p.innerText.includes('All Topics'))) {
+                    p.className = "kb-pill bg-sky-600 text-white px-3 py-1.5 rounded-full font-medium";
+                } else {
+                    p.className = "kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200";
+                }
+            });
+            cards.forEach(card => {
+                const cardCat = card.getAttribute('data-category') || '';
+                if (cat === 'All' || cardCat.includes(cat)) card.classList.remove('hidden');
+                else card.classList.add('hidden');
+            });
+        };
+
+        function updateDashboardMetrics() {
+            const totalLeads = leads.length;
+            const totalValue = leads.reduce((acc, l) => acc + (l.value || 0), 0);
+            const hotLeads = leads.filter(l => l.score >= 80).length;
+            const totalVol = leads.reduce((acc, l) => acc + (l.volume || 0), 0);
+
+            if (document.getElementById('dash-total-leads')) document.getElementById('dash-total-leads').innerText = totalLeads;
+            if (document.getElementById('dash-total-val')) document.getElementById('dash-total-val').innerText = `R${totalValue.toLocaleString()}`;
+            if (document.getElementById('dash-hot-leads')) document.getElementById('dash-hot-leads').innerText = hotLeads;
+            if (document.getElementById('dash-water-volume')) document.getElementById('dash-water-volume').innerText = `${totalVol.toLocaleString()} m³/day`;
+
+            if (categoryChart) {
+                categoryChart.data.datasets[0].data = [
+                    leads.filter(l => l.category === 'Greywater').length,
+                    leads.filter(l => l.category === 'Borehole').length,
+                    leads.filter(l => l.category === 'Mining').length,
+                    leads.filter(l => l.category === 'Ground / Surface Water').length
+                ];
+                categoryChart.update();
+            }
+
+            if (pipelineChart) {
+                const stages = ['New', 'Initial Contact', 'Qualified Lead', 'Proposal Sent', 'Closed Won'];
+                pipelineChart.data.datasets[0].data = stages.map(st => leads.filter(l => l.stage === st).reduce((acc, l) => acc + (l.value || 0), 0));
+                pipelineChart.update();
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initCharts();
+            calculateROI();
+        });
+
+        function initCharts() {
+            const ctxCat = document.getElementById('categoryChart')?.getContext('2d');
+            if (ctxCat) {
+                categoryChart = new Chart(ctxCat, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Greywater', 'Borehole', 'Mining', 'Ground / Surface Water'],
+                        datasets: [{ data: [0,0,0,0], backgroundColor: ['#0d9488', '#4f46e5', '#d97706', '#0284c7'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+            const ctxPipe = document.getElementById('pipelineChart')?.getContext('2d');
+            if (ctxPipe) {
+                pipelineChart = new Chart(ctxPipe, {
+                    type: 'bar',
+                    data: {
+                        labels: ['New', 'Initial Contact', 'Qualified Lead', 'Proposal Sent', 'Closed Won'],
+                        datasets: [{ data: [0,0,0,0,0], backgroundColor: '#0284c7' }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
