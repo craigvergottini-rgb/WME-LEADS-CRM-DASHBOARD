@@ -41,31 +41,6 @@
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Person Name & Title *</label>
                     <input type="text" id="edit-contact" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Category *</label>
-                        <select id="edit-category" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
-                            <option value="Greywater">Greywater</option>
-                            <option value="Mining">Mining & Chrome</option>
-                            <option value="Borehole">Borehole</option>
-                            <option value="Ground / Surface Water">Ground / Surface Water</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Capacity (m³/day) *</label>
-                        <input type="number" id="edit-volume" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">ZAR Value (R)</label>
-                        <input type="number" id="edit-value" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Score (0-100)</label>
-                        <input type="number" id="edit-score" min="0" max="100" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
-                    </div>
-                </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
                     <input type="email" id="edit-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
@@ -77,7 +52,7 @@
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium rounded-lg flex items-center gap-1">
-                        <i data-lucide="check" class="w-4 h-4"></i> Save & Sync
+                        <i data-lucide="check" class="w-4 h-4"></i> Save Changes
                     </button>
                 </div>
             </form>
@@ -98,21 +73,21 @@
             <form onsubmit="saveManualLead(event)" class="space-y-4 text-xs">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Company / Facility Name *</label>
-                    <input type="text" id="man-company" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Broll Property Group (EWS)">
+                    <input type="text" id="man-company" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Mediclinic Head Office">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Contact Person *</label>
-                        <input type="text" id="man-contact" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Facilities Lead">
+                        <input type="text" id="man-contact" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Infrastructure Manager">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Phone Number</label>
-                        <input type="text" id="man-phone" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="011 441 4000">
+                        <input type="text" id="man-phone" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="021 809 6500">
                     </div>
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Email Address</label>
-                    <input type="email" id="man-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="ews@broll.com">
+                    <input type="email" id="man-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="petrus.swanepoel@mediclinic.co.za">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -149,53 +124,6 @@
                     <button type="button" onclick="closeManualAddModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium rounded-lg flex items-center gap-1">
                         <i data-lucide="check" class="w-4 h-4"></i> Save New Lead
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ADD KNOWLEDGE BASE ACCOUNT MODAL -->
-    <div id="manual-kb-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full border border-slate-200 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="book-plus" class="w-5 h-5 text-sky-600"></i> Add Knowledge Base Entry
-                </h3>
-                <button onclick="closeKbModal()" class="text-slate-400 hover:text-slate-600">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <form onsubmit="saveKbEntry(event)" class="space-y-4 text-xs">
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Company / Account Name *</label>
-                    <input type="text" id="kb-company" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Growthpoint Properties">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Category / Sector *</label>
-                    <select id="kb-category" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
-                        <option value="Balwin">Developers & Eco-Estates</option>
-                        <option value="Chrome">Chrome & Mining Washplants</option>
-                        <option value="SurfaceWater">Ground / Surface Water</option>
-                        <option value="Greywater Hospitals">Medical & Commercial Networks</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Scale Metrics & Footprint</label>
-                    <input type="text" id="kb-metrics" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. ~5.5M m² AUM across 150 sites">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Target Decision-Makers</label>
-                    <input type="text" id="kb-contact" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Head of Sustainability & Utilities Lead">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Strategic Overview & Opportunities</label>
-                    <textarea id="kb-overview" rows="3" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="Details on HVAC cooling towers, borehole RO, and effluent recycling..."></textarea>
-                </div>
-                <div class="flex justify-end gap-2 pt-3 border-t">
-                    <button type="button" onclick="closeKbModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium rounded-lg flex items-center gap-1">
-                        <i data-lucide="check" class="w-4 h-4"></i> Save Account Entry
                     </button>
                 </div>
             </form>
@@ -496,9 +424,6 @@
                         <button onclick="openManualAddModal()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium py-2 px-3 rounded-lg flex items-center gap-1 shadow-sm">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Manual Lead
                         </button>
-                        <button onclick="resetToDefaultLeads()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium py-2 px-3 rounded-lg flex items-center gap-1">
-                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Sample Data
-                        </button>
                         <button onclick="exportToCSV()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium py-2 px-4 rounded-lg flex items-center gap-2">
                             <i data-lucide="download" class="w-4 h-4"></i> Export to CSV
                         </button>
@@ -581,113 +506,22 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h2 class="text-lg font-bold text-slate-900">Technical Knowledge Base & South Africa Market Guide</h2>
-                        <p class="text-xs text-slate-500">Balwin Properties estate specs, chrome washplants, hospital networks, surface water intake, and key decision-makers.</p>
+                        <p class="text-xs text-slate-500">Balwin Properties estate specs, chrome washplants, hospital networks, surface water intake.</p>
                     </div>
-
-                    <div class="flex items-center gap-3 w-full md:w-auto">
-                        <div class="relative w-full md:w-64">
-                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
-                            <input type="text" id="kb-search" onkeyup="filterKB()" placeholder="Search Balwin, chrome..." class="pl-9 text-sm border border-slate-300 rounded-lg p-2 w-full">
-                        </div>
-                        <button onclick="openKbModal()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium py-2 px-3 rounded-lg flex items-center gap-1 whitespace-nowrap shadow-sm">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Account Entry
-                        </button>
+                    <div class="relative w-full md:w-72">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+                        <input type="text" id="kb-search" onkeyup="filterKB()" placeholder="Search Balwin, chrome..." class="pl-9 text-sm border border-slate-300 rounded-lg p-2 w-full">
                     </div>
                 </div>
-
-                <!-- Category Filter Pills -->
-                <div class="flex flex-wrap gap-2 mb-6 text-xs">
-                    <button onclick="filterKBCategory('All')" class="kb-pill bg-sky-600 text-white px-3 py-1.5 rounded-full font-medium">All Topics</button>
-                    <button onclick="filterKBCategory('Balwin')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Balwin & Developers</button>
-                    <button onclick="filterKBCategory('Chrome')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Chrome Washplants</button>
-                    <button onclick="filterKBCategory('Greywater')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Greywater (Commercial)</button>
-                    <button onclick="filterKBCategory('SurfaceWater')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Ground / Surface Water</button>
-                    <button onclick="filterKBCategory('Hospitals')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Hospitals</button>
-                    <button onclick="filterKBCategory('JobTitles')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Decision-Makers</button>
-                </div>
-
-                <!-- Knowledge Base Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="kb-card-grid">
-
-                    <!-- CARD 1: Balwin Properties -->
-                    <div class="kb-card border border-teal-300 bg-teal-50/60 rounded-xl p-5 hover:shadow-md transition" data-category="Balwin Greywater Developers">
-                        <div class="flex items-center gap-2 text-teal-900 font-bold mb-2">
-                            <i data-lucide="building-2" class="w-5 h-5 text-teal-600"></i>
-                            <h3>1. Balwin Properties & Eco-Estate Greywater Systems</h3>
-                        </div>
-                        <div class="text-xs space-y-2 text-slate-800">
-                            <p><strong>Overview:</strong> Leading eco-friendly residential developer operating <i>Balwin Green Living</i> and <i>Balwin Infrastructure</i>.</p>
-                            <p><strong>Flagship Estates:</strong> Mooikloof Smart City, The Reid, Greenlee, Greencreek, Greenpark, The Blyde, Polofields.</p>
-                            <p><strong>Treatment Applications:</strong> Greywater harvesting for irrigation and toilet flushing; onsite MBR wastewater treatment.</p>
-                            <p class="pt-1"><strong>Key Decision-Makers:</strong> Steve Brookes (CEO), Head of Balwin Infrastructure, Balwin Green Living Asset Manager.</p>
-                        </div>
+                    <div class="kb-card border border-teal-300 bg-teal-50/60 rounded-xl p-5" data-category="Balwin">
+                        <h3 class="font-bold text-teal-900 mb-2">1. Balwin Properties & Eco-Estate Greywater Systems</h3>
+                        <p class="text-xs text-slate-800">Flagship estates: Mooikloof, The Reid, Greenlee. Greywater harvesting and MBR wastewater treatment plants.</p>
                     </div>
-
-                    <!-- CARD 2: Chrome Washplants -->
-                    <div class="kb-card border border-amber-300 bg-amber-50/60 rounded-xl p-5 hover:shadow-md transition" data-category="Chrome Mining">
-                        <div class="flex items-center gap-2 text-amber-900 font-bold mb-2">
-                            <i data-lucide="pickaxe" class="w-5 h-5 text-amber-600"></i>
-                            <h3>2. South African Chrome Washplant Operators & Processing</h3>
-                        </div>
-                        <div class="text-xs space-y-2 text-slate-800">
-                            <p><strong>Key Operators:</strong> Tharisa Minerals, Samancor Chrome, Glencore Ferrochrome, Hernic Ferrochrome, Jubilee Metals Group.</p>
-                            <p><strong>Concentration:</strong> Bushveld Igneous Complex (Steelpoort, Burgersfort, Tubatse, Rustenburg, Brits).</p>
-                            <p><strong>Treatment Applications:</strong> Thickener overflow clarification, flocculant dosing, slimes dam decant water recovery.</p>
-                            <p class="pt-1"><strong>Key Decision-Makers:</strong> General Manager (GM), Plant Metallurgist, Resident Engineer (GCC).</p>
-                        </div>
+                    <div class="kb-card border border-amber-300 bg-amber-50/60 rounded-xl p-5" data-category="Chrome">
+                        <h3 class="font-bold text-amber-900 mb-2">2. South African Chrome Washplant Operators</h3>
+                        <p class="text-xs text-slate-800">Tharisa, Samancor, Glencore, Hernic. Thickener overflow and slimes dam decant water recovery.</p>
                     </div>
-
-                    <!-- CARD 3: Ground / Surface Water -->
-                    <div class="kb-card border border-sky-300 bg-sky-50/60 rounded-xl p-5 hover:shadow-md transition" data-category="SurfaceWater">
-                        <div class="flex items-center gap-2 text-sky-900 font-bold mb-2">
-                            <i data-lucide="waves" class="w-5 h-5 text-sky-600"></i>
-                            <h3>3. Ground / Surface Water Treatment Systems</h3>
-                        </div>
-                        <div class="text-xs space-y-2 text-slate-800">
-                            <p><strong>Target Facilities:</strong> River abstraction plants, dam intakes, agricultural estates, rural municipal utilities.</p>
-                            <p><strong>Treatment Applications:</strong> Coagulation (PAC dosing), Dissolved Air Flotation (DAF), Ultrafiltration (UF) delivering SANS 241 potability.</p>
-                            <p class="pt-1"><strong>Key Decision-Makers:</strong> Water Resources Engineer, Infrastructure Operations Manager, Agricultural Director.</p>
-                        </div>
-                    </div>
-
-                    <!-- CARD 4: Medical & Commercial Networks -->
-                    <div class="kb-card border border-teal-300 bg-teal-50/60 rounded-xl p-5 hover:shadow-md transition" data-category="Greywater Hospitals">
-                        <div class="flex items-center gap-2 text-teal-900 font-bold mb-2">
-                            <i data-lucide="cross" class="w-5 h-5 text-teal-600"></i>
-                            <h3>4. Greywater & Medical Water (Hospital Networks)</h3>
-                        </div>
-                        <div class="text-xs space-y-2 text-slate-800">
-                            <p><strong>Target Networks:</strong> Netcare, Mediclinic, Life Healthcare, Busamed, NHLS.</p>
-                            <p><strong>Treatment Applications:</strong> High-purity hemodialysis RO (SANS 241 / ISO 13959), greywater reuse for sanitation, backup purification.</p>
-                            <p class="pt-1"><strong>Key Decision-Makers:</strong> Group Technical Engineer, Clinical Engineering Manager, Hospital GM.</p>
-                        </div>
-                    </div>
-
-                    <!-- CARD 5: Decision Makers Matrix -->
-                    <div class="kb-card border border-slate-300 bg-slate-100 rounded-xl p-5 hover:shadow-md transition" data-category="JobTitles">
-                        <div class="flex items-center gap-2 text-slate-900 font-bold mb-2">
-                            <i data-lucide="user-check" class="w-5 h-5 text-slate-700"></i>
-                            <h3>5. Key Target Decision-Makers Matrix</h3>
-                        </div>
-                        <div class="text-xs space-y-2 text-slate-800">
-                            <p><strong>Developers:</strong> Head of Infrastructure, Green Living Manager, Precinct Operations Director.</p>
-                            <p><strong>Chrome & Mining:</strong> General Manager, Plant Metallurgist, Resident Engineer (GCC).</p>
-                            <p><strong>Hospitals:</strong> Group Technical Engineer, Clinical Engineering Manager, Infection Control Lead.</p>
-                        </div>
-                    </div>
-
-                    <!-- CARD 6: SANS 241 Regulatory Framework -->
-                    <div class="kb-card border border-slate-200 rounded-xl p-5 bg-slate-50/50 hover:shadow-md transition" data-category="Standards">
-                        <div class="flex items-center gap-2 text-slate-800 font-bold mb-2">
-                            <i data-lucide="shield-check" class="w-5 h-5 text-indigo-600"></i>
-                            <h3>6. SA Regulatory Framework: SANS 241 & DWS Licensing</h3>
-                        </div>
-                        <div class="text-xs space-y-2 text-slate-700">
-                            <p><strong>SANS 241 Standard:</strong> Zero E. coli / 100ml, Nitrate &lt; 11 mg/L, Iron &lt; 0.3 mg/L, TDS &lt; 1200 mg/L.</p>
-                            <p><strong>DWS WULA License:</strong> Required under National Water Act for commercial borehole abstraction and industrial discharge.</p>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </section>
@@ -713,36 +547,25 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const leadsRef = ref(db, 'leads');
-        const kbRef = ref(db, 'knowledge_base');
 
         let leads = [];
-        let kbEntries = [];
         let categoryChart, pipelineChart;
 
         const initialSampleLeads = [
-            { id: 1, company: "Balwin Properties (Balwin Green Living)", contact: "Steve Brookes (CEO) / Head of Infrastructure", email: "info@balwin.co.za", phone: "+27 (0)11 450 2818", category: "Greywater", volume: 1200, urgency: "Immediate (< 1 month)", issue: "Greywater Reuse & Estate Irrigation", notes: "Greywater recycling & MBR wastewater treatment plants for Mooikloof, The Reid & Greenlee estates", value: 7800000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 2, company: "Mediclinic head office", contact: "Petrus Swanepoel infrastructure Manager", email: "petrus.swanepoel@mediclinic.co.za", phone: "021 809 6500", category: "Greywater", volume: 450, urgency: "Immediate (< 1 month)", issue: "High Municipal Tariffs & Water Shedding", notes: "Head office infrastructure contact for corporate greywater and water security", value: 3250000, score: 91, stage: "Initial Contact", qualification: "Interested made contact (follow up)", processStatus: "In process" },
-            { id: 3, company: "Tharisa Minerals (Chrome Washplant)", contact: "Plant Metallurgist & Resident GCC Engineer", email: "enquiries@tharisa.com", phone: "+27 (0)11 996 3500", category: "Mining", volume: 3200, urgency: "Immediate (< 1 month)", issue: "Thickener Overflow & Process Water Clarification", notes: "High-capacity thickener overflow recycling for spiral and DMS washplant circuits", value: 11200000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 4, company: "Samancor Chrome (Tubatse Works)", contact: "General Manager & Processing Operations Lead", email: "info@samancorcr.com", phone: "+27 (0)11 245 1000", category: "Mining", volume: 4500, urgency: "1-3 Months", issue: "Slimes Dam Decant & Ultrafine Chromite Fines", notes: "Slimes dam water recovery and ultrafine chromite filtration system in Steelpoort", value: 15500000, score: 94, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 5, company: "Glencore Ferrochrome (Eastern Complex)", contact: "Metallurgical Manager & Water Infrastructure Director", email: "info@glencore.co.za", phone: "+27 (0)13 235 7000", category: "Mining", volume: 5000, urgency: "Immediate (< 1 month)", issue: "Acid Mine Drainage & High Sulphates", notes: "Closed-loop process water treatment and heavy metal precipitation for chrome smelting", value: 18000000, score: 97, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 6, company: "Hernic Ferrochrome (Brits Washplant)", contact: "Senior Plant Metallurgist & GCC Engineer", email: "info@hernic.co.za", phone: "+27 (0)12 252 8000", category: "Mining", volume: 2800, urgency: "1-3 Months", issue: "Thickener Overflow & Process Water Clarification", notes: "DMS washplant water clarification and tailings thickener optimisation", value: 9500000, score: 90, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 7, company: "Jubilee Metals Group (Dilokong Chrome)", contact: "Head of Tailings Retreatment & Operations", email: "info@jubileemetalsgroup.com", phone: "+27 (0)11 268 6555", category: "Mining", volume: 3800, urgency: "Immediate (< 1 month)", issue: "Slimes Dam Decant & Ultrafine Chromite Fines", notes: "Surface tailings retreatment and ultrafiltration water recirculation", value: 13200000, score: 93, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 8, company: "Sibanye-Stillwater (Westonaria Ops)", contact: "Dr. Richard Stewart (CEO) / Operational Technical Lead", email: "richard.stewart@sibanyestillwater.com", phone: "+27 (0)11 278 9600", category: "Mining", volume: 3500, urgency: "Immediate (< 1 month)", issue: "Acid Mine Drainage & High Sulphates", notes: "Underground dewatering & high-recovery neutralization plant", value: 12500000, score: 95, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 9, company: "Netcare Sunninghill Hospital", contact: "Hospital Management & Regional Facilities Engineer", email: "customer.care@netcare.co.za", phone: "+27 (0)11 806 1500", category: "Greywater", volume: 450, urgency: "Immediate (< 1 month)", issue: "Greywater Reuse & Estate Irrigation", notes: "SANS 241 & ISO 13959 high-purity medical RO for hemodialysis and backup", value: 2800000, score: 92, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 10, company: "Mall of Africa (Attacq Ltd)", contact: "Jackie van Niekerk (CEO) / Precinct Facilities Manager", email: "enquiries@attacq.co.za", phone: "+27 (0)10 596 1470", category: "Greywater", volume: 850, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "HVAC cooling tower makeup water, bio-fouling control and greywater harvesting", value: 4200000, score: 85, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 11, company: "Montecasino Complex (Tsogo Sun)", contact: "Director of Property Operations & Technical Infrastructure", email: "montecasino.contact@tsogosun.com", phone: "+27 (0)11 510 7000", category: "Greywater", volume: 650, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "Blackwater reclamation & greywater treatment for cooling towers and fountains", value: 3900000, score: 82, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 12, company: "Rand Water (Vaal Intake Operations)", contact: "Sipho Mosai (CEO) / Bulk Water Operations Director", email: "customerservice@randwater.co.za", phone: "+27 (0)11 682 0911", category: "Ground / Surface Water", volume: 15000, urgency: "Immediate (< 1 month)", issue: "Surface Water River Intake Turbidity & Algae", notes: "High-turbidity Vaal River surface water intake, PAC dosing, UF multi-barrier", value: 45000000, score: 98, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 13, company: "Heineken SA (Sedibeng Brewery)", contact: "Brewery Supply Chain Director & Plant Utilities Manager", email: "info.southafrica@heineken.com", phone: "+27 (0)86 044 8377", category: "Borehole", volume: 950, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "Industrial deep borehole brackish RO desalination & softening for boiler feed", value: 6200000, score: 87, stage: "New", qualification: "New lead", processStatus: "In process" }
+            { id: 1, company: "Balwin Properties (Balwin Green Living)", contact: "Steve Brookes (CEO)", email: "info@balwin.co.za", phone: "+27 (0)11 450 2818", category: "Greywater", volume: 1200, urgency: "Immediate (< 1 month)", issue: "Greywater Reuse & Estate Irrigation", notes: "Greywater recycling & MBR wastewater treatment", value: 7800000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
+            { id: 2, company: "Mediclinic head office", contact: "Petrus Swanepoel infrastructure Manager", email: "petrus.swanepoel@mediclinic.co.za", phone: "021 809 6500", category: "Greywater", volume: 450, urgency: "Immediate (< 1 month)", issue: "High Municipal Tariffs & Water Shedding", notes: "Head office infrastructure contact", value: 3250000, score: 91, stage: "Initial Contact", qualification: "Interested made contact (follow up)", processStatus: "In process" },
+            { id: 3, company: "Tharisa Minerals (Chrome Washplant)", contact: "Plant Metallurgist", email: "enquiries@tharisa.com", phone: "+27 (0)11 996 3500", category: "Mining", volume: 3200, urgency: "Immediate (< 1 month)", issue: "Thickener Overflow & Process Water Clarification", notes: "High-capacity thickener overflow", value: 11200000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" }
         ];
 
-        // Realtime Listener for Pipeline Leads
         onValue(leadsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 leads = Object.entries(data).map(([firebaseKey, leadVal]) => ({ ...leadVal, firebaseKey }));
             } else {
+                // If database is empty, check local storage for any previously added manual leads, otherwise use samples
                 const localSaved = localStorage.getItem('wme_projects_master_leads_v12');
                 const seedData = localSaved ? JSON.parse(localSaved) : initialSampleLeads;
+                
                 leads = [];
                 seedData.forEach(l => {
                     const newRef = push(leadsRef);
@@ -756,13 +579,6 @@
             document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Sync Error`;
         });
 
-        // Realtime Listener for Knowledge Base Entries
-        onValue(kbRef, (snapshot) => {
-            const data = snapshot.val();
-            kbEntries = data ? Object.entries(data).map(([firebaseKey, val]) => ({ ...val, firebaseKey })) : [];
-            renderCustomKbCards();
-        });
-
         window.switchTab = function(tabId) {
             ['dashboard', 'generator', 'add-lead', 'leads-list', 'roi-calc', 'knowledge'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
@@ -772,20 +588,8 @@
             document.getElementById(`tab-${tabId}`).classList.add('active-tab');
         };
 
-        window.resetToDefaultLeads = function() {
-            if (confirm("Reset database back to the official SA target leads (including Mediclinic Head Office & Balwin)?")) {
-                set(leadsRef, null).then(() => {
-                    initialSampleLeads.forEach(l => {
-                        const newRef = push(leadsRef);
-                        set(newRef, l);
-                    });
-                });
-            }
-        };
-
         window.submitNewLead = function(e) {
             e.preventDefault();
-            const vol = parseFloat(document.getElementById('form-volume').value) || 100;
             const newLead = {
                 id: Date.now(),
                 company: document.getElementById('form-company').value,
@@ -793,13 +597,13 @@
                 email: document.getElementById('form-email').value,
                 phone: document.getElementById('form-phone').value,
                 category: document.getElementById('form-category').value,
-                volume: vol,
+                volume: parseFloat(document.getElementById('form-volume').value),
                 urgency: document.getElementById('form-urgency').value,
                 qualification: document.getElementById('form-qualification').value,
                 processStatus: document.getElementById('form-process-status').value,
                 issue: document.getElementById('form-issue').value,
                 notes: document.getElementById('form-notes').value,
-                value: vol * 12000,
+                value: parseFloat(document.getElementById('form-volume').value) * 12000,
                 score: 85,
                 stage: 'New'
             };
@@ -820,42 +624,26 @@
             const catFilter = filterCat.value;
 
             const filtered = leads.filter(l => {
-                const matchesSearch = l.company.toLowerCase().includes(search) || 
-                                      l.contact.toLowerCase().includes(search) ||
-                                      (l.issue && l.issue.toLowerCase().includes(search));
+                const matchesSearch = l.company.toLowerCase().includes(search) || l.contact.toLowerCase().includes(search);
                 const matchesCat = catFilter === 'All' || l.category === catFilter;
                 return matchesSearch && matchesCat;
             });
 
             tbody.innerHTML = filtered.map(l => {
-                const qual = l.qualification || 'New lead';
-                const proc = l.processStatus || 'In process';
-                const issueText = l.issue || 'N/A';
                 const key = l.firebaseKey || l.id;
                 return `
                 <tr class="hover:bg-slate-50 border-b border-slate-200">
                     <td class="p-3">
                         <div class="font-bold text-slate-900">${l.company}</div>
                         <div class="text-xs text-slate-500">${l.contact} • ${l.phone}</div>
-                        <div class="text-[11px] text-sky-600">${l.email}</div>
                     </td>
-                    <td class="p-3">
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${
-                            l.category === 'Greywater' ? 'bg-teal-100 text-teal-800' :
-                            l.category === 'Borehole' ? 'bg-indigo-100 text-indigo-800' : 
-                            l.category === 'Mining' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'
-                        }">${l.category}</span>
-                    </td>
+                    <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-800">${l.category}</span></td>
                     <td class="p-3 font-medium">${l.volume} m³/day</td>
                     <td class="p-3 font-bold text-slate-800">R${(l.value || 0).toLocaleString()}</td>
-                    <td class="p-3 font-bold ${l.score >= 80 ? 'text-amber-600' : 'text-slate-600'}">${l.score}/100</td>
+                    <td class="p-3 font-bold text-amber-600">${l.score}/100</td>
+                    <td class="p-3"><span class="bg-slate-100 text-xs px-2 py-1 rounded">${l.issue || 'N/A'}</span></td>
                     <td class="p-3">
-                        <span class="inline-block bg-slate-100 text-slate-800 text-xs px-2.5 py-1 rounded-md border border-slate-200 font-medium">
-                            ${issueText}
-                        </span>
-                    </td>
-                    <td class="p-3">
-                        <select onchange="updateStage('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium">
+                        <select onchange="updateStage('${key}', this.value)" class="text-xs border rounded p-1">
                             <option value="New" ${l.stage === 'New' ? 'selected' : ''}>New</option>
                             <option value="Initial Contact" ${l.stage === 'Initial Contact' ? 'selected' : ''}>Initial Contact</option>
                             <option value="Qualified Lead" ${l.stage === 'Qualified Lead' ? 'selected' : ''}>Qualified Lead</option>
@@ -863,41 +651,10 @@
                             <option value="Closed Won" ${l.stage === 'Closed Won' ? 'selected' : ''}>Closed Won</option>
                         </select>
                     </td>
-                    <td class="p-3">
-                        <select onchange="updateQualification('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
-                            qual === 'New lead' ? 'text-blue-700 bg-blue-50 border-blue-200' :
-                            qual === 'Deal won' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
-                            qual === 'Deal lost' ? 'text-rose-700 bg-rose-50 border-rose-200' :
-                            qual === 'Not interested' ? 'text-slate-500 bg-slate-100 border-slate-200' :
-                            qual === 'In contract (revisit 1 year)' ? 'text-amber-700 bg-amber-50 border-amber-200' :
-                            'text-sky-700 bg-sky-50 border-sky-200'
-                        }">
-                            <option value="New lead" ${qual === 'New lead' ? 'selected' : ''}>New lead</option>
-                            <option value="Interested made contact (follow up)" ${qual === 'Interested made contact (follow up)' ? 'selected' : ''}>Interested made contact (follow up)</option>
-                            <option value="In contract (revisit 1 year)" ${qual === 'In contract (revisit 1 year)' ? 'selected' : ''}>In contract (revisit 1 year)</option>
-                            <option value="Not interested" ${qual === 'Not interested' ? 'selected' : ''}>Not interested</option>
-                            <option value="Deal won" ${qual === 'Deal won' ? 'selected' : ''}>Deal won</option>
-                            <option value="Deal lost" ${qual === 'Deal lost' ? 'selected' : ''}>Deal lost</option>
-                        </select>
-                    </td>
-                    <td class="p-3">
-                        <select onchange="updateProcessStatus('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
-                            proc === 'In process' ? 'text-sky-700 bg-sky-50 border-sky-200' :
-                            proc === 'Pending' ? 'text-amber-700 bg-amber-50 border-amber-200' :
-                            proc === 'On hold' ? 'text-slate-600 bg-slate-100 border-slate-200' :
-                            'text-emerald-700 bg-emerald-50 border-emerald-200'
-                        }">
-                            <option value="In process" ${proc === 'In process' ? 'selected' : ''}>In process</option>
-                            <option value="Pending" ${proc === 'Pending' ? 'selected' : ''}>Pending</option>
-                            <option value="On hold" ${proc === 'On hold' ? 'selected' : ''}>On hold</option>
-                            <option value="Completed" ${proc === 'Completed' ? 'selected' : ''}>Completed</option>
-                        </select>
-                    </td>
+                    <td class="p-3">${l.qualification || 'New lead'}</td>
+                    <td class="p-3">${l.processStatus || 'In process'}</td>
                     <td class="p-3 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                            <button onclick="openEditModal('${key}')" class="text-sky-600 hover:text-sky-800 text-xs font-semibold">Edit</button>
-                            <button onclick="deleteLead('${key}')" class="text-red-500 hover:text-red-700 text-xs font-semibold">Delete</button>
-                        </div>
+                        <button onclick="deleteLead('${key}')" class="text-red-500 hover:text-red-700 text-xs font-semibold">Delete</button>
                     </td>
                 </tr>
             `}).join('');
@@ -906,223 +663,14 @@
             lucide.createIcons();
         };
 
-        window.openEditModal = function(key) {
-            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
-            if (!lead) return;
-            document.getElementById('edit-lead-id').value = key;
-            document.getElementById('edit-company').value = lead.company || '';
-            document.getElementById('edit-contact').value = lead.contact || '';
-            document.getElementById('edit-category').value = lead.category || 'Greywater';
-            document.getElementById('edit-volume').value = lead.volume || 100;
-            document.getElementById('edit-value').value = lead.value || 500000;
-            document.getElementById('edit-score').value = lead.score || 75;
-            document.getElementById('edit-email').value = lead.email || '';
-            document.getElementById('edit-phone').value = lead.phone || '';
-            document.getElementById('edit-contact-modal').classList.remove('hidden');
-            lucide.createIcons();
-        };
-
-        window.closeEditModal = function() {
-            document.getElementById('edit-contact-modal').classList.add('hidden');
-        };
-
-        window.saveContactEdit = function(e) {
-            e.preventDefault();
-            const key = document.getElementById('edit-lead-id').value;
-            const lead = leads.find(l => (l.firebaseKey === key || l.id == key));
-            if (lead && lead.firebaseKey) {
-                update(ref(db, `leads/${lead.firebaseKey}`), {
-                    company: document.getElementById('edit-company').value,
-                    contact: document.getElementById('edit-contact').value,
-                    category: document.getElementById('edit-category').value,
-                    volume: parseFloat(document.getElementById('edit-volume').value) || 0,
-                    value: parseFloat(document.getElementById('edit-value').value) || 0,
-                    score: parseInt(document.getElementById('edit-score').value) || 50,
-                    email: document.getElementById('edit-email').value,
-                    phone: document.getElementById('edit-phone').value
-                });
-                closeEditModal();
-            }
-        };
-
-        window.openManualAddModal = function() {
-            document.getElementById('man-company').value = '';
-            document.getElementById('man-contact').value = '';
-            document.getElementById('man-phone').value = '';
-            document.getElementById('man-email').value = '';
-            document.getElementById('man-volume').value = '450';
-            document.getElementById('manual-lead-modal').classList.remove('hidden');
-            lucide.createIcons();
-        };
-
-        window.closeManualAddModal = function() {
-            document.getElementById('manual-lead-modal').classList.add('hidden');
-        };
-
-        window.saveManualLead = function(e) {
-            e.preventDefault();
-            const company = document.getElementById('man-company').value;
-            const contact = document.getElementById('man-contact').value;
-            const phone = document.getElementById('man-phone').value;
-            const email = document.getElementById('man-email').value;
-            const category = document.getElementById('man-category').value;
-            const volume = parseFloat(document.getElementById('man-volume').value) || 250;
-            const stage = document.getElementById('man-stage').value;
-            const issue = document.getElementById('man-issue').value;
-
-            const newLead = {
-                id: Date.now(),
-                company,
-                contact,
-                email: email || 'info@' + company.toLowerCase().replace(/[^a-z]/g, '') + '.co.za',
-                phone: phone || '+27 11 ' + Math.floor(1000000 + Math.random() * 9000000),
-                category,
-                volume,
-                urgency: '1-3 Months',
-                qualification: 'Interested made contact (follow up)',
-                processStatus: 'In process',
-                issue,
-                notes: 'Manually added lead',
-                value: volume * 12000,
-                score: 85,
-                stage
-            };
-
-            const newRef = push(leadsRef);
-            set(newRef, newLead);
-            closeManualAddModal();
-            alert(`Lead "${company}" saved to cloud!`);
-        };
-
-        window.openKbModal = function() {
-            document.getElementById('kb-company').value = '';
-            document.getElementById('kb-metrics').value = '';
-            document.getElementById('kb-contact').value = '';
-            document.getElementById('kb-overview').value = '';
-            document.getElementById('manual-kb-modal').classList.remove('hidden');
-            lucide.createIcons();
-        };
-
-        window.closeKbModal = function() {
-            document.getElementById('manual-kb-modal').classList.add('hidden');
-        };
-
-        window.saveKbEntry = function(e) {
-            e.preventDefault();
-            const newKb = {
-                company: document.getElementById('kb-company').value,
-                category: document.getElementById('kb-category').value,
-                metrics: document.getElementById('kb-metrics').value,
-                contact: document.getElementById('kb-contact').value,
-                overview: document.getElementById('kb-overview').value,
-                createdAt: new Date().toISOString()
-            };
-            const newRef = push(kbRef);
-            set(newRef, newKb);
-            closeKbModal();
-        };
-
-        window.deleteKbEntry = function(key) {
-            if (confirm("Remove this entry from Knowledge Base?")) {
-                remove(ref(db, `knowledge_base/${key}`));
-            }
-        };
-
-        function renderCustomKbCards() {
-            const grid = document.getElementById('kb-card-grid');
-            const existingDynamic = grid.querySelectorAll('.dynamic-kb');
-            existingDynamic.forEach(el => el.remove());
-
-            kbEntries.forEach(kb => {
-                const card = document.createElement('div');
-                card.className = "kb-card dynamic-kb border border-sky-300 bg-sky-50/60 rounded-xl p-5 hover:shadow-md transition space-y-2";
-                card.setAttribute('data-category', kb.category || 'All');
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-sky-900 text-sm">${escapeHtml(kb.company)}</h3>
-                        <button onclick="deleteKbEntry('${kb.firebaseKey}')" class="text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                    <div class="text-xs space-y-1 text-slate-800">
-                        <p><strong>Scale & Footprint:</strong> ${escapeHtml(kb.metrics || 'N/A')}</p>
-                        <p><strong>Key Contacts:</strong> ${escapeHtml(kb.contact || 'N/A')}</p>
-                        <p class="text-slate-700 mt-1">${escapeHtml(kb.overview || '')}</p>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-            lucide.createIcons();
-        }
-
         window.updateStage = function(key, newStage) {
             const lead = leads.find(l => l.firebaseKey === key || l.id == key);
             if (lead && lead.firebaseKey) update(ref(db, `leads/${lead.firebaseKey}`), { stage: newStage });
         };
 
-        window.updateQualification = function(key, newQualification) {
-            const lead = leads.find(l => l.firebaseKey === key || l.id == key);
-            if (lead && lead.firebaseKey) update(ref(db, `leads/${lead.firebaseKey}`), { qualification: newQualification });
-        };
-
-        window.updateProcessStatus = function(key, newStatus) {
-            const lead = leads.find(l => l.firebaseKey === key || l.id == key);
-            if (lead && lead.firebaseKey) update(ref(db, `leads/${lead.firebaseKey}`), { processStatus: newStatus });
-        };
-
         window.deleteLead = function(key) {
             const lead = leads.find(l => l.firebaseKey === key || l.id == key);
             if (lead && lead.firebaseKey && confirm("Delete this lead?")) remove(ref(db, `leads/${lead.firebaseKey}`));
-        };
-
-        let tempGenerated = [];
-        window.runLeadGenerator = function() {
-            const cat = document.getElementById('gen-category').value;
-            const samples = [
-                { company: "Balwin Properties (Balwin Green Living)", cat: "Greywater", vol: 1200, contact: "Steve Brookes (CEO)", issue: "Greywater Reuse & Estate Irrigation" },
-                { company: "Mediclinic head office", cat: "Greywater", vol: 450, contact: "Petrus Swanepoel infrastructure Manager", issue: "High Municipal Tariffs & Water Shedding" },
-                { company: "Tharisa Minerals (Chrome Washplant)", cat: "Mining", vol: 3200, contact: "Plant Metallurgist", issue: "Thickener Overflow & Process Water Clarification" },
-                { company: "Samancor Chrome (Tubatse Works)", cat: "Mining", vol: 4500, contact: "General Manager", issue: "Slimes Dam Decant & Ultrafine Chromite Fines" },
-                { company: "Glencore Ferrochrome (Eastern Complex)", cat: "Mining", vol: 5000, contact: "Metallurgical Manager", issue: "Acid Mine Drainage & High Sulphates" }
-            ];
-            tempGenerated = samples.filter(s => cat === 'All' || s.cat === cat);
-            const container = document.getElementById('generated-leads-list');
-            container.innerHTML = tempGenerated.map((g, idx) => `
-                <div class="p-4 border border-slate-200 rounded-lg bg-slate-50 flex justify-between items-center">
-                    <div>
-                        <div class="font-bold text-slate-800 text-sm">${g.company}</div>
-                        <div class="text-xs text-slate-500">${g.cat} • ${g.vol} m³/day</div>
-                    </div>
-                    <button onclick="importSingleLead(${idx})" class="bg-sky-600 text-white text-xs px-3 py-1.5 rounded hover:bg-sky-700">Import</button>
-                </div>
-            `).join('');
-            document.getElementById('generator-results-container').classList.remove('hidden');
-        };
-
-        window.importSingleLead = function(idx) {
-            const item = tempGenerated[idx];
-            const newLead = {
-                id: Date.now() + idx,
-                company: item.company,
-                contact: item.contact,
-                email: "info@" + item.company.toLowerCase().replace(/[^a-z]/g, "") + ".co.za",
-                phone: "+27 11 " + Math.floor(1000000 + Math.random() * 9000000),
-                category: item.cat,
-                volume: item.vol,
-                urgency: "1-3 Months",
-                qualification: "Interested made contact (follow up)",
-                processStatus: "In process",
-                issue: item.issue,
-                notes: "Scraped via Prospector Engine",
-                value: item.vol * 12000,
-                score: 90,
-                stage: 'Initial Contact'
-            };
-            const newRef = push(leadsRef);
-            set(newRef, newLead);
-            alert(`Imported ${item.company} to cloud pipeline!`);
-        };
-
-        window.addAllGeneratedLeads = function() {
-            tempGenerated.forEach((g, idx) => importSingleLead(idx));
         };
 
         window.calculateROI = function() {
@@ -1147,33 +695,6 @@
             a.href = window.URL.createObjectURL(blob);
             a.download = 'WME_Leads.csv';
             a.click();
-        };
-
-        window.filterKB = function() {
-            const query = document.getElementById('kb-search').value.toLowerCase();
-            const cards = document.querySelectorAll('.kb-card');
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                if (text.includes(query)) card.classList.remove('hidden');
-                else card.classList.add('hidden');
-            });
-        };
-
-        window.filterKBCategory = function(cat) {
-            const cards = document.querySelectorAll('.kb-card');
-            const pills = document.querySelectorAll('.kb-pill');
-            pills.forEach(p => {
-                if (p.innerText.includes(cat) || (cat === 'All' && p.innerText.includes('All Topics'))) {
-                    p.className = "kb-pill bg-sky-600 text-white px-3 py-1.5 rounded-full font-medium";
-                } else {
-                    p.className = "kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200";
-                }
-            });
-            cards.forEach(card => {
-                const cardCat = card.getAttribute('data-category') || '';
-                if (cat === 'All' || cardCat.includes(cat)) card.classList.remove('hidden');
-                else card.classList.add('hidden');
-            });
         };
 
         function updateDashboardMetrics() {
@@ -1202,10 +723,6 @@
                 pipelineChart.data.datasets[0].data = stages.map(st => leads.filter(l => l.stage === st).reduce((acc, l) => acc + (l.value || 0), 0));
                 pipelineChart.update();
             }
-        }
-
-        function escapeHtml(str) {
-            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
