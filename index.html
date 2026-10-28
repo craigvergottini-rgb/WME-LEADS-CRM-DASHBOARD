@@ -3,241 +3,672 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WME Projects & CRM Dashboard</title>
-    <!-- Tailwind CSS CDN -->
+    <title>WME Projects Lead Generator & Pipeline Dashboard</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        .active-tab { border-bottom: 3px solid #0284c7; color: #0284c7; font-weight: 600; }
+        .logo-backdrop {
+            background: linear-gradient(135deg, #0f172a 0%, #0369a1 50%, #082f49 100%);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-slate-50 font-sans text-slate-800">
 
-    <!-- Top Navigation Header -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="bg-cyan-500 text-slate-950 p-2.5 rounded-lg font-bold text-xl flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                    <i class="fa-solid fa-droplet"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-                        WME Projects CRM <span class="text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full font-medium">Live Cloud Sync</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Industrial Water Treatment & Facility Management</p>
-                </div>
-            </div>
-            
-            <!-- Quick Actions & Status -->
-            <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
-                <span id="sync-status" class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Connected to Firebase
-                </span>
-                <button onclick="openAddLeadModal()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-4 py-2 rounded-lg font-semibold text-sm transition-all shadow-md shadow-cyan-500/20 flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> New Lead
+    <!-- EDIT CONTACT MODAL -->
+    <div id="edit-contact-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="user-cog" class="w-5 h-5 text-sky-600"></i> Edit Contact Info
+                </h3>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-        </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
-
-        <!-- Navigation Tabs -->
-        <div class="flex border-b border-slate-800 space-x-6">
-            <button onclick="switchTab('pipeline')" id="tab-pipeline" class="pb-3 border-b-2 border-cyan-500 text-cyan-400 font-semibold text-sm flex items-center gap-2 transition-all">
-                <i class="fa-solid fa-chart-line"></i> Pipeline Manager
-            </button>
-            <button onclick="switchTab('knowledge')" id="tab-knowledge" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-semibold text-sm flex items-center gap-2 transition-all">
-                <i class="fa-solid fa-building-columns"></i> Knowledge Base (Accounts)
-            </button>
-        </div>
-
-        <!-- TAB 1: PIPELINE MANAGER -->
-        <div id="section-pipeline" class="space-y-6">
-            <!-- Pipeline Metrics Bar -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
-                    <p class="text-xs font-medium text-slate-400">Total Active Pipeline</p>
-                    <h3 id="metric-total-value" class="text-2xl font-bold text-white mt-1">R 0</h3>
-                    <p class="text-xs text-cyan-400 mt-1"><span id="metric-total-count">0</span> Active Opportunities</p>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
-                    <p class="text-xs font-medium text-slate-400">Weighted Forecast</p>
-                    <h3 id="metric-weighted-value" class="text-2xl font-bold text-emerald-400 mt-1">R 0</h3>
-                    <p class="text-xs text-slate-400 mt-1">Based on stage probability</p>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
-                    <p class="text-xs font-medium text-slate-400">Avg. Opportunity Score</p>
-                    <h3 id="metric-avg-score" class="text-2xl font-bold text-amber-400 mt-1">0 / 100</h3>
-                    <p class="text-xs text-slate-400 mt-1">Lead qualification index</p>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
-                    <p class="text-xs font-medium text-slate-400">Key Target Account</p>
-                    <h3 class="text-lg font-bold text-white mt-1 truncate">Broll Property Group</h3>
-                    <p class="text-xs text-cyan-400 mt-1">~44M m² / EWS Division</p>
-                </div>
-            </div>
-
-            <!-- Leads Table / Kanban View -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900/50">
-                    <h2 class="font-semibold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-cyan-400"></i> Opportunities & Accounts Directory
-                    </h2>
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <input type="text" id="search-input" onkeyup="filterLeads()" placeholder="Search company, category..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-cyan-500 w-full sm:w-64">
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-800 text-xs font-semibold text-slate-400 bg-slate-950/40 uppercase tracking-wider">
-                                <th class="p-4">Company & Contact</th>
-                                <th class="p-4">Category</th>
-                                <th class="p-4">Capacity</th>
-                                <th class="p-4">ZAR Value</th>
-                                <th class="p-4">Score</th>
-                                <th class="p-4">Stage</th>
-                                <th class="p-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leads-table-body" class="divide-y divide-slate-800 text-sm">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 2: KNOWLEDGE BASE -->
-        <div id="section-knowledge" class="space-y-6 hidden">
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl space-y-6">
-                <div class="flex justify-between items-start border-b border-slate-800 pb-4">
-                    <div>
-                        <span class="text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2.5 py-1 rounded-full font-semibold">Tier 1 Enterprise Account</span>
-                        <h2 class="text-2xl font-bold text-white mt-2">Broll Property Group (Pty) Ltd</h2>
-                        <p class="text-sm text-slate-400 mt-1">Energy, Water & Sustainability (EWS) / Integrated Facilities Management Division</p>
-                    </div>
-                    <button onclick="loadBrollToPipeline()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-4 py-2 rounded-lg font-semibold text-xs transition-all flex items-center gap-2 shadow">
-                        <i class="fa-solid fa-bolt"></i> Add to Pipeline
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800">
-                        <h4 class="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-pie mr-1"></i> Scale & Metrics</h4>
-                        <ul class="space-y-2 text-xs text-slate-300">
-                            <li><strong>Footprint:</strong> ~44M m² under management</li>
-                            <li><strong>Portfolio:</strong> 400+ major shopping centres</li>
-                            <li><strong>Asset Value:</strong> $17B+ (R300B+) AUM</li>
-                            <li><strong>Countries:</strong> Active across 37 African nations</li>
-                        </ul>
-                    </div>
-                    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800">
-                        <h4 class="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-bullseye mr-1"></i> EWS Division Focus</h4>
-                        <ul class="space-y-2 text-xs text-slate-300">
-                            <li><strong>Mandate:</strong> Smart building retrofits & alternative energy</li>
-                            <li><strong>Water:</strong> Water saving & utility recovery optimization</li>
-                            <li><strong>Compliance:</strong> ESG implementation & GBCSA ratings</li>
-                        </ul>
-                    </div>
-                    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800">
-                        <h4 class="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-coins mr-1"></i> Potential Sizing Tiers</h4>
-                        <ul class="space-y-2 text-xs text-slate-300">
-                            <li><strong>Tier 1 Pilot:</strong> R350k – R750k / yr</li>
-                            <li><strong>Tier 2 Precinct:</strong> R2.5M – R5.5M / yr</li>
-                            <li><strong>Tier 3 Enterprise MSP:</strong> R12M – R25M+ / yr</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- ADD / EDIT LEAD MODAL -->
-    <div id="lead-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 id="modal-title" class="text-lg font-bold text-white">Add New Opportunity</h3>
-                <button onclick="closeLeadModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            
-            <form id="lead-form" onsubmit="saveLead(event)" class="space-y-4">
-                <input type="hidden" id="lead-id">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Company Name</label>
-                        <input type="text" id="form-company" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Contact Person</label>
-                        <input type="text" id="form-contact" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Category</label>
-                        <select id="form-category" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                            <option value="HVAC Cooling Tower">HVAC Cooling Tower</option>
-                            <option value="Water Treatment Plant">Water Treatment Plant</option>
-                            <option value="Municipal Backup / RO">Municipal Backup / RO</option>
-                            <option value="Chemical Dosing / MSP">Chemical Dosing / MSP</option>
-                            <option value="Smart Metering / EWS">Smart Metering / EWS</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Capacity / Scale</label>
-                        <input type="text" id="form-capacity" placeholder="e.g. 50 m³/h or 12 Sites" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">ZAR Value (R)</label>
-                        <input type="number" id="form-zar" placeholder="500000" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Score (0-100)</label>
-                        <input type="number" id="form-score" min="0" max="100" value="75" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Pipeline Stage</label>
-                        <select id="form-stage" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                            <option value="Prospecting">Prospecting</option>
-                            <option value="Qualified">Qualified</option>
-                            <option value="Quoted">Quoted</option>
-                            <option value="Closed Won">Closed Won</option>
-                        </select>
-                    </div>
-                </div>
-
+            <form onsubmit="saveContactEdit(event)" class="space-y-4">
+                <input type="hidden" id="edit-lead-id">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Notes / Scope Summary</label>
-                    <textarea id="form-notes" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"></textarea>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Company / Facility Name *</label>
+                    <input type="text" id="edit-company" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
                 </div>
-
-                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeLeadModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold rounded-lg">Cancel</button>
-                    <button type="submit" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-sm font-semibold rounded-lg shadow">Save & Sync</button>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Person Name & Title *</label>
+                    <input type="text" id="edit-contact" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                    <input type="email" id="edit-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+                    <input type="text" id="edit-phone" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium rounded-lg flex items-center gap-1">
+                        <i data-lucide="check" class="w-4 h-4"></i> Save Changes
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Firebase SDK Scripts -->
+    <!-- MANUAL ADD LEAD MODAL -->
+    <div id="manual-lead-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full border border-slate-200 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-5 h-5 text-sky-600"></i> Add New Lead Manually
+                </h3>
+                <button onclick="closeManualAddModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form onsubmit="saveManualLead(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Company / Facility Name *</label>
+                    <input type="text" id="man-company" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Mediclinic Head Office">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Contact Person *</label>
+                        <input type="text" id="man-contact" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Infrastructure Manager">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Phone Number</label>
+                        <input type="text" id="man-phone" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="021 809 6500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Email Address</label>
+                    <input type="email" id="man-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="petrus.swanepoel@mediclinic.co.za">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Treatment Category *</label>
+                        <select id="man-category" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                            <option value="Greywater" selected>Greywater</option>
+                            <option value="Mining">Mining & Chrome</option>
+                            <option value="Borehole">Borehole</option>
+                            <option value="Ground / Surface Water">Ground / Surface Water</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Daily Capacity (m³/day) *</label>
+                        <input type="number" id="man-volume" required min="1" value="450" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Pipeline Stage *</label>
+                        <select id="man-stage" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                            <option value="New">New</option>
+                            <option value="Initial Contact" selected>Initial Contact</option>
+                            <option value="Qualified Lead">Qualified Lead</option>
+                            <option value="Proposal Sent">Proposal Sent</option>
+                            <option value="Closed Won">Closed Won</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Primary Issue / Focus</label>
+                        <input type="text" id="man-issue" value="High Municipal Tariffs & Water Shedding" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t">
+                    <button type="button" onclick="closeManualAddModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium rounded-lg flex items-center gap-1">
+                        <i data-lucide="check" class="w-4 h-4"></i> Save New Lead
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header / Navbar with Logo Integration & Firebase Sync Status -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            <!-- WME Projects Branding & Logo -->
+            <div class="flex items-center gap-3">
+                <div class="bg-slate-800 p-1.5 rounded-lg border border-sky-600/40 flex items-center shadow-md justify-center">
+                    <img 
+                        src="wme-logo.png" 
+                        alt="WME Projects Logo" 
+                        class="h-10 w-auto object-contain rounded"
+                        onerror="this.onerror=null; this.src='https://wmeprojects.co.za/images/logo.png'; this.onerror=function(){ this.style.display='none'; document.getElementById('wme-svg-fallback').classList.remove('hidden'); };" 
+                    />
+                    <div id="wme-svg-fallback" class="hidden flex items-center gap-1.5 px-1">
+                        <svg class="w-7 h-7 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path>
+                        </svg>
+                        <span class="font-extrabold text-sky-400 text-base tracking-wider">WME</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        WME Projects Lead Generator
+                        <span id="sync-status" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-medium">Live Cloud Sync Active</span>
+                    </h1>
+                    <p class="text-xs text-sky-400">Water Treatment Lead Generator & CRM Dashboard</p>
+                </div>
+            </div>
+
+            <!-- Target Category Badges -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+                <span class="bg-teal-900/80 text-teal-300 border border-teal-700 px-3 py-1 rounded-full flex items-center gap-1">
+                    <i data-lucide="recycle" class="w-3.5 h-3.5"></i> Greywater (Incl. Commercial)
+                </span>
+                <span class="bg-indigo-900/80 text-indigo-300 border border-indigo-700 px-3 py-1 rounded-full flex items-center gap-1">
+                    <i data-lucide="drill" class="w-3.5 h-3.5"></i> Borehole
+                </span>
+                <span class="bg-amber-900/80 text-amber-300 border border-amber-700 px-3 py-1 rounded-full flex items-center gap-1">
+                    <i data-lucide="pickaxe" class="w-3.5 h-3.5"></i> Mining & Chrome Washplants
+                </span>
+                <span class="bg-sky-900/80 text-sky-300 border border-sky-700 px-3 py-1 rounded-full flex items-center gap-1">
+                    <i data-lucide="waves" class="w-3.5 h-3.5"></i> Ground / Surface Water
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-white border-b border-slate-200 shadow-sm sticky top-[69px] z-40">
+        <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-8 text-sm text-slate-600">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-4 px-2 active-tab flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Executive Dashboard
+            </button>
+            <button onclick="switchTab('generator')" id="tab-generator" class="py-4 px-2 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="radar" class="w-4 h-4"></i> WME Lead Prospector
+            </button>
+            <button onclick="switchTab('add-lead')" id="tab-add-lead" class="py-4 px-2 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Lead Intake
+            </button>
+            <button onclick="switchTab('leads-list')" id="tab-leads-list" class="py-4 px-2 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="list-checks" class="w-4 h-4"></i> Pipeline Manager (<span id="lead-count-badge">0</span>)
+            </button>
+            <button onclick="switchTab('roi-calc')" id="tab-roi-calc" class="py-4 px-2 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="calculator" class="w-4 h-4"></i> Treatment ROI Estimator
+            </button>
+            <button onclick="switchTab('knowledge')" id="tab-knowledge" class="py-4 px-2 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="book-open" class="w-4 h-4"></i> Knowledge Base
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <!-- TAB 1: EXECUTIVE DASHBOARD -->
+        <section id="view-dashboard" class="space-y-6">
+            <!-- Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase">Total Qualified Leads</span>
+                        <i data-lucide="users" class="w-5 h-5 text-sky-600"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-900" id="dash-total-leads">0</div>
+                    <p class="text-xs text-emerald-600 mt-2 font-medium">↑ Active In Pipeline</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase">Estimated Pipeline Value</span>
+                        <i data-lucide="dollar-sign" class="w-5 h-5 text-emerald-600"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-900" id="dash-total-val">R0</div>
+                    <p class="text-xs text-slate-500 mt-2">Combined Equipment & Systems</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase">High Priority / High Volume</span>
+                        <i data-lucide="flame" class="w-5 h-5 text-amber-500"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-900" id="dash-hot-leads">0</div>
+                    <p class="text-xs text-amber-600 mt-2 font-medium">Score ≥ 80 / Large Flow</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase">Est. Daily Water Volume</span>
+                        <i data-lucide="droplet" class="w-5 h-5 text-indigo-600"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-900" id="dash-water-volume">0 m³/day</div>
+                    <p class="text-xs text-slate-500 mt-2">Total Capacity Requirement</p>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-sky-600"></i> Leads Breakdown by Treatment Category
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-600"></i> Pipeline Value by Sales Stage (ZAR)
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="pipelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: PROSPECT FINDER -->
+        <section id="view-generator" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 mb-2">WME Projects Lead Prospector (South Africa)</h2>
+                <p class="text-xs text-slate-500 mb-6">Select criteria to simulate target prospect discovery across SA mining, commercial developers, municipal, and surface water databases.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Water Treatment Category</label>
+                        <select id="gen-category" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                            <option value="All">All Categories</option>
+                            <option value="Greywater">Greywater (Commercial / Residential Estates)</option>
+                            <option value="Borehole">Borehole Water Purification</option>
+                            <option value="Mining">Mining & Chrome Washplants</option>
+                            <option value="Ground / Surface Water">Ground / Surface Water</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Target Region / Zone</label>
+                        <select id="gen-region" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                            <option value="Gauteng / Industrial Belt">Gauteng / Industrial Belt</option>
+                            <option value="Western Cape / Coastal">Western Cape / Coastal</option>
+                            <option value="Mpumalanga Coalfields">Mpumalanga Coalfields</option>
+                            <option value="Limpopo Mining Corridor">Limpopo Mining Corridor</option>
+                            <option value="Bushveld Igneous Complex (Chrome)">Bushveld Igneous Complex (Chrome)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Minimum Volume Target</label>
+                        <select id="gen-volume" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                            <option value="Small">Small (&lt; 20 m³/day)</option>
+                            <option value="Medium">Medium (20 - 200 m³/day)</option>
+                            <option value="Large">Large (&gt; 200 m³/day)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+                        <button onclick="runLeadGenerator()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-medium text-sm py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i> Generate Leads
+                        </button>
+                    </div>
+                </div>
+
+                <div id="generator-results-container" class="hidden border-t border-slate-200 pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> New SA Prospect Matches Discovered
+                        </h3>
+                        <button onclick="addAllGeneratedLeads()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-3 rounded-md flex items-center gap-1">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Import All into Pipeline
+                        </button>
+                    </div>
+
+                    <div id="generated-leads-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: INTAKE FORM -->
+        <section id="view-add-lead" class="hidden">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-3xl mx-auto">
+                <h2 class="text-lg font-bold text-slate-900 mb-1">Lead Qualification & Intake Form</h2>
+                <p class="text-xs text-slate-500 mb-6">Enter new water treatment inquiry details to score and prioritize.</p>
+
+                <form id="lead-form" onsubmit="submitNewLead(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Company / Facility Name *</label>
+                            <input type="text" id="form-company" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Mediclinic Head Office">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Person Name & Title *</label>
+                            <input type="text" id="form-contact" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Petrus Swanepoel Infrastructure Manager">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                            <input type="email" id="form-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="petrus.swanepoel@mediclinic.co.za">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+                            <input type="text" id="form-phone" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="021 809 6500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Treatment Category *</label>
+                            <select id="form-category" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                                <option value="Greywater">Greywater (Commercial / Residential)</option>
+                                <option value="Mining">Mining & Chrome Washplants</option>
+                                <option value="Borehole">Borehole Purification</option>
+                                <option value="Ground / Surface Water">Ground / Surface Water</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Daily Capacity (m³/day) *</label>
+                            <input type="number" id="form-volume" required min="1" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. 450">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Urgency / Timeline</label>
+                            <select id="form-urgency" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                                <option value="Immediate (< 1 month)">Immediate (&lt; 1 month)</option>
+                                <option value="1-3 Months">1-3 Months</option>
+                                <option value="Planning Phase (> 3 months)">Planning Phase (&gt; 3 months)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Primary Qualification Status</label>
+                            <select id="form-qualification" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                                <option value="New lead">New lead</option>
+                                <option value="Interested made contact (follow up)" selected>Interested made contact (follow up)</option>
+                                <option value="In contract (revisit 1 year)">In contract (revisit 1 year)</option>
+                                <option value="Not interested">Not interested</option>
+                                <option value="Deal won">Deal won</option>
+                                <option value="Deal lost">Deal lost</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Process Status</label>
+                            <select id="form-process-status" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                                <option value="In process" selected>In process</option>
+                                <option value="Pending">Pending</option>
+                                <option value="On hold">On hold</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Primary Water Quality Concern</label>
+                        <select id="form-issue" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                            <option value="High Municipal Tariffs & Water Shedding">High Municipal Tariffs & Water Shedding</option>
+                            <option value="Greywater Reuse & Estate Irrigation">Greywater Reuse & Estate Irrigation</option>
+                            <option value="Thickener Overflow & Process Water Clarification">Thickener Overflow & Process Water Clarification</option>
+                            <option value="Slimes Dam Decant & Ultrafine Chromite Fines">Slimes Dam Decant & Ultrafine Chromite Fines</option>
+                            <option value="Acid Mine Drainage & High Sulphates">Acid Mine Drainage & High Sulphates</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Notes / Technical Parameters</label>
+                        <textarea id="form-notes" rows="3" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="Head office infrastructure, corporate water security, SANS 241 compliance..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition">
+                        <i data-lucide="check" class="w-5 h-5"></i> Calculate Lead Score & Save Lead
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 4: PIPELINE MANAGER TABLE -->
+        <section id="view-leads-list" class="hidden space-y-4">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <div class="relative w-full md:w-64">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+                            <input type="text" id="search-input" onkeyup="renderLeadsTable()" placeholder="Search company, contact, issue..." class="pl-9 text-sm border border-slate-300 rounded-lg p-2 w-full">
+                        </div>
+                        <select id="filter-category" onchange="renderLeadsTable()" class="text-sm border border-slate-300 rounded-lg p-2">
+                            <option value="All">All Categories</option>
+                            <option value="Greywater">Greywater</option>
+                            <option value="Borehole">Borehole</option>
+                            <option value="Mining">Mining & Chrome</option>
+                            <option value="Ground / Surface Water">Ground / Surface Water</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="openManualAddModal()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium py-2 px-3 rounded-lg flex items-center gap-1 shadow-sm">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Manual Lead
+                        </button>
+                        <button onclick="resetToDefaultLeads()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium py-2 px-3 rounded-lg flex items-center gap-1">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Sample Data
+                        </button>
+                        <button onclick="exportToCSV()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium py-2 px-4 rounded-lg flex items-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i> Export to CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 text-xs uppercase font-semibold border-b border-slate-200">
+                                <th class="p-3">Company & Contact</th>
+                                <th class="p-3">Category</th>
+                                <th class="p-3">Capacity</th>
+                                <th class="p-3">Est. Value (ZAR)</th>
+                                <th class="p-3">Score</th>
+                                <th class="p-3">Primary Issue</th>
+                                <th class="p-3">Pipeline Stage</th>
+                                <th class="p-3">Lead Qualification</th>
+                                <th class="p-3">Process Status</th>
+                                <th class="p-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-body" class="divide-y divide-slate-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: ROI CALCULATOR -->
+        <section id="view-roi-calc" class="hidden">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-4xl mx-auto">
+                <h2 class="text-lg font-bold text-slate-900 mb-1">WME Water Treatment System ROI Calculator (ZAR)</h2>
+                <p class="text-xs text-slate-500 mb-6">Estimate payback periods and savings for client presentation calls in South Africa.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold text-slate-800 border-b pb-2">Client Operating Inputs</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Daily Treated Volume (m³/day)</label>
+                            <input type="number" id="roi-volume" value="100" oninput="calculateROI()" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Municipal Water Tariff (R per m³)</label>
+                            <input type="number" id="roi-tariff" value="65.00" step="1.00" oninput="calculateROI()" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">CAPEX / System Cost (R)</label>
+                            <input type="number" id="roi-capex" value="1200000" step="25000" oninput="calculateROI()" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">OPEX per Treated m³ (R)</label>
+                            <input type="number" id="roi-opex" value="12.50" step="0.50" oninput="calculateROI()" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 text-white rounded-xl p-6 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs text-sky-400 font-semibold uppercase tracking-wider">Financial Projection</span>
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <div class="text-xs text-slate-400">Gross Annual Savings</div>
+                                    <div class="text-2xl font-bold text-emerald-400" id="calc-gross-savings">R0</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-400">Net Annual Savings (After OPEX)</div>
+                                    <div class="text-2xl font-bold text-emerald-300" id="calc-net-savings">R0</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-400">Simple Payback Period</div>
+                                    <div class="text-3xl font-extrabold text-sky-400" id="calc-payback">0 Months</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: WATER TREATMENT KNOWLEDGE BASE -->
+        <section id="view-knowledge" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Technical Knowledge Base & South Africa Market Guide</h2>
+                        <p class="text-xs text-slate-500">Balwin Properties estate specs, chrome washplants, hospital networks, surface water intake, and decision-maker directories.</p>
+                    </div>
+
+                    <div class="relative w-full md:w-72">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+                        <input type="text" id="kb-search" onkeyup="filterKB()" placeholder="Search Balwin, chrome, hospitals..." class="pl-9 text-sm border border-slate-300 rounded-lg p-2 w-full">
+                    </div>
+                </div>
+
+                <!-- Category Filter Pills -->
+                <div class="flex flex-wrap gap-2 mb-6 text-xs">
+                    <button onclick="filterKBCategory('All')" class="kb-pill bg-sky-600 text-white px-3 py-1.5 rounded-full font-medium">All Topics</button>
+                    <button onclick="filterKBCategory('Balwin')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Balwin & Developers</button>
+                    <button onclick="filterKBCategory('Chrome')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Chrome Washplants</button>
+                    <button onclick="filterKBCategory('Greywater')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Greywater (Commercial)</button>
+                    <button onclick="filterKBCategory('SurfaceWater')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Ground / Surface Water</button>
+                    <button onclick="filterKBCategory('Hospitals')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Hospitals</button>
+                    <button onclick="filterKBCategory('JobTitles')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Decision-Makers</button>
+                </div>
+
+                <!-- Knowledge Base Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="kb-card-grid">
+
+                    <!-- CARD 1: Balwin Properties & Residential Developers -->
+                    <div class="kb-card border border-teal-300 bg-teal-50/60 rounded-xl p-5 hover:shadow-md transition" data-category="Balwin Greywater Developers">
+                        <div class="flex items-center gap-2 text-teal-900 font-bold mb-2">
+                            <i data-lucide="building-2" class="w-5 h-5 text-teal-600"></i>
+                            <h3>1. Balwin Properties & Eco-Estate Greywater Systems</h3>
+                        </div>
+                        <div class="text-xs space-y-2 text-slate-800">
+                            <p><strong>Overview:</strong> Balwin Properties is SA's leading eco-friendly residential developer. Operates dedicated divisions: <i>Balwin Green Living</i> (Renewables & Wastewater) and <i>Balwin Infrastructure</i>.</p>
+                            <p><strong>Key Flagship Estates:</strong> Mooikloof Smart City (Tshwane), The Reid (Linbro Park), Greenlee, Greencreek, Greenpark, The Blyde (Pretoria East), Polofields (Waterfall).</p>
+                            <p><strong>Water Treatment Applications:</strong></p>
+                            <ul class="list-disc pl-4 space-y-1 text-slate-700">
+                                <li><strong>Greywater Harvesting:</strong> Reclaiming shower/basin discharge for estate landscape irrigation and flushing lifestyle center toilets.</li>
+                                <li><strong>Wastewater Recycling & MBR:</strong> Onsite Membrane Bioreactor (MBR) treatment plants to achieve EDGE Green & 6-Star Green Star rating compliance.</li>
+                            </ul>
+                            <p class="pt-1"><strong>Target Decision-Makers:</strong> Steve Brookes (CEO), Head of Balwin Infrastructure, Balwin Green Living Asset Manager, Precinct Engineering Lead.</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD 2: Chrome Washplant Operators & Mineral Processing -->
+                    <div class="kb-card border border-amber-300 bg-amber-50/60 rounded-xl p-5 hover:shadow-md transition" data-category="Chrome Mining">
+                        <div class="flex items-center gap-2 text-amber-900 font-bold mb-2">
+                            <i data-lucide="pickaxe" class="w-5 h-5 text-amber-600"></i>
+                            <h3>2. South African Chrome Washplant Operators & Processing</h3>
+                        </div>
+                        <div class="text-xs space-y-2 text-slate-800">
+                            <p><strong>Key Operators & Producers:</strong> Tharisa Minerals, Samancor Chrome, Glencore Ferrochrome, Hernic Ferrochrome, Jubilee Metals Group (tailings retreatment), ASA Metals, Afarak Holdings.</p>
+                            <p><strong>Geographic Concentration:</strong> Bushveld Igneous Complex (Eastern Limb: Steelpoort, Burgersfort, Tubatse; Western Limb: Rustenburg, Brits, Thabazimbi).</p>
+                            <p><strong>Process Water Treatment Applications:</strong></p>
+                            <ul class="list-disc pl-4 space-y-1 text-slate-700">
+                                <li><strong>Thickener Overflow & Clarification:</strong> High-rate clarification and flocculant dosing for spiral and DMS washplant circuits.</li>
+                                <li><strong>Slimes Dam Decant & Ultrafine Fines:</strong> Filtering ultrafine chromite suspended solids for closed-loop water recovery.</li>
+                            </ul>
+                            <p class="pt-1"><strong>Target Decision-Makers:</strong> General Manager (GM), Plant Metallurgist, Resident Engineer (GCC), Environmental Manager.</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD 3: Ground / Surface Water Treatment -->
+                    <div class="kb-card border border-sky-300 bg-sky-50/60 rounded-xl p-5 hover:shadow-md transition" data-category="SurfaceWater">
+                        <div class="flex items-center gap-2 text-sky-900 font-bold mb-2">
+                            <i data-lucide="waves" class="w-5 h-5 text-sky-600"></i>
+                            <h3>3. Ground / Surface Water Treatment Systems</h3>
+                        </div>
+                        <div class="text-xs space-y-2 text-slate-800">
+                            <p><strong>Target Facilities:</strong> River abstraction plants, dam intake installations, agricultural estates, rural municipal utilities, remote lodges.</p>
+                            <p><strong>Water Treatment Applications:</strong></p>
+                            <ul class="list-disc pl-4 space-y-1 text-slate-700">
+                                <li><strong>Coagulation & Flocculation:</strong> Dosing poly-aluminum chloride (PAC) for colloidal particle settling.</li>
+                                <li><strong>Dissolved Air Flotation (DAF) & Clarification:</strong> Removing high turbidity, organic algae blooms, and suspended silt.</li>
+                                <li><strong>Ultrafiltration (UF) & Media Filtration:</strong> Multi-barrier particulate and pathogen removal delivering SANS 241 potability.</li>
+                            </ul>
+                            <p class="pt-1"><strong>Target Decision-Makers:</strong> Water Resources Engineer, Infrastructure Operations Manager, Agricultural Director, Municipal Water Engineer.</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD 4: Greywater Commercial - Hospital Networks -->
+                    <div class="kb-card border border-teal-300 bg-teal-50/60 rounded-xl p-5 hover:shadow-md transition" data-category="Greywater Hospitals">
+                        <div class="flex items-center gap-2 text-teal-900 font-bold mb-2">
+                            <i data-lucide="cross" class="w-5 h-5 text-teal-600"></i>
+                            <h3>4. Greywater & Medical Water (Hospital Networks)</h3>
+                        </div>
+                        <div class="text-xs space-y-2 text-slate-800">
+                            <p><strong>Target Networks in SA:</strong> Netcare, Mediclinic, Life Healthcare, Busamed, NHLS, Regional Public Hospitals.</p>
+                            <p><strong>Water Treatment Applications:</strong></p>
+                            <ul class="list-disc pl-4 space-y-1 text-slate-700">
+                                <li><strong>Hemodialysis Pure Water:</strong> High-purity RO systems complying with SANS 241 & ISO 13959 medical water specs.</li>
+                                <li><strong>Greywater Reuse:</strong> Reusing basin water for sanitation and estate grounds.</li>
+                                <li><strong>Water Security Backup:</strong> Borehole and greywater purification to avoid operational shutdown during municipal outages.</li>
+                            </ul>
+                            <p class="pt-1"><strong>Target Decision-Makers:</strong> Group Technical Engineer, Clinical Engineering Manager, Hospital GM, Infection Control Lead.</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD 5: Decision Maker Job Titles Matrix -->
+                    <div class="kb-card border border-slate-300 bg-slate-100 rounded-xl p-5 hover:shadow-md transition" data-category="JobTitles">
+                        <div class="flex items-center gap-2 text-slate-900 font-bold mb-2">
+                            <i data-lucide="user-check" class="w-5 h-5 text-slate-700"></i>
+                            <h3>Key Target Decision-Makers Matrix</h3>
+                        </div>
+                        <div class="text-xs space-y-2 text-slate-800">
+                            <p><strong>Developers (Balwin):</strong> Head of Infrastructure, Green Living Manager, Precinct Operations Director.</p>
+                            <p><strong>Chrome & Mining:</strong> General Manager, Plant Metallurgist, Resident Engineer (GCC), Head of Processing.</p>
+                            <p><strong>Hospitals:</strong> Group Technical Engineer, Clinical Engineering Manager, Infection Control Officer.</p>
+                            <p><strong>Malls & Retail:</strong> Facilities Manager, Regional Property Manager, Utilities Lead.</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD 6: South African Compliance & SANS 241 -->
+                    <div class="kb-card border border-slate-200 rounded-xl p-5 bg-slate-50/50 hover:shadow-md transition" data-category="Standards">
+                        <div class="flex items-center gap-2 text-slate-800 font-bold mb-2">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-indigo-600"></i>
+                            <h3>SA Regulatory Framework: SANS 241 & DWS Licensing</h3>
+                        </div>
+                        <div class="text-xs space-y-2 text-slate-700">
+                            <p><strong>SANS 241 Drinking Standard:</strong> Specifies limits for drinking water (Microbiological: 0 E. coli; Chemical: Nitrate &lt; 11 mg/L, Iron &lt; 0.3 mg/L, TDS &lt; 1200 mg/L).</p>
+                            <p><strong>DWS Water Use License (WULA):</strong> Required under National Water Act for commercial borehole abstraction, surface water intake, and industrial discharge into natural watercourses.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FIREBASE REALTIME DATABASE SYNC & APP CONTROLLER -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Your Firebase Configuration
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyASEFR8b4EAJUJbHrAE_NWg9rmmfkW7A1A",
             authDomain: "wme-projects-crm.firebaseapp.com",
@@ -245,215 +676,3 @@
             projectId: "wme-projects-crm",
             storageBucket: "wme-projects-crm.firebasestorage.app",
             messagingSenderId: "1098842258085",
-            appId: "1:1098842258085:web:b4dfc6addbf92b16f52b4c",
-            measurementId: "G-1FNGJS260V"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const leadsRef = ref(db, 'leads');
-
-        let allLeads = {};
-
-        // Listen for Realtime Database updates
-        onValue(leadsRef, (snapshot) => {
-            const data = snapshot.val();
-            allLeads = data || {};
-            renderLeads(allLeads);
-            updateMetrics(allLeads);
-        }, (error) => {
-            document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400"></span> Sync Error`;
-        });
-
-        // Make functions globally available
-        window.saveLead = function(event) {
-            event.preventDefault();
-            const id = document.getElementById('lead-id').value;
-            const leadData = {
-                company: document.getElementById('form-company').value,
-                contact: document.getElementById('form-contact').value,
-                category: document.getElementById('form-category').value,
-                capacity: document.getElementById('form-capacity').value,
-                zarValue: parseFloat(document.getElementById('form-zar').value) || 0,
-                score: parseInt(document.getElementById('form-score').value) || 50,
-                stage: document.getElementById('form-stage').value,
-                notes: document.getElementById('form-notes').value,
-                updatedAt: new Date().toISOString()
-            };
-
-            if (id) {
-                // Update existing
-                update(ref(db, 'leads/' + id), leadData);
-            } else {
-                // Push new
-                const newRef = push(leadsRef);
-                set(newRef, leadData);
-            }
-            closeLeadModal();
-        };
-
-        window.deleteLead = function(id) {
-            if (confirm("Are you sure you want to delete this opportunity?")) {
-                remove(ref(db, 'leads/' + id));
-            }
-        };
-
-        window.editLead = function(id) {
-            const lead = allLeads[id];
-            if (!lead) return;
-            document.getElementById('lead-id').value = id;
-            document.getElementById('form-company').value = lead.company || '';
-            document.getElementById('form-contact').value = lead.contact || '';
-            document.getElementById('form-category').value = lead.category || 'HVAC Cooling Tower';
-            document.getElementById('form-capacity').value = lead.capacity || '';
-            document.getElementById('form-zar').value = lead.zarValue || 0;
-            document.getElementById('form-score').value = lead.score || 50;
-            document.getElementById('form-stage').value = lead.stage || 'Prospecting';
-            document.getElementById('form-notes').value = lead.notes || '';
-            document.getElementById('modal-title').innerText = "Edit Opportunity";
-            document.getElementById('lead-modal').classList.remove('hidden');
-        };
-
-        window.openAddLeadModal = function() {
-            document.getElementById('lead-id').value = '';
-            document.getElementById('lead-form').reset();
-            document.getElementById('form-score').value = "75";
-            document.getElementById('modal-title').innerText = "Add New Opportunity";
-            document.getElementById('lead-modal').classList.remove('hidden');
-        };
-
-        window.closeLeadModal = function() {
-            document.getElementById('lead-modal').classList.add('hidden');
-        };
-
-        window.loadBrollToPipeline = function() {
-            const brollLead = {
-                company: "Broll Property Group (EWS)",
-                contact: "Facilities & Sustainability Lead",
-                category: "Smart Metering / EWS",
-                capacity: "44M m² / 400+ Centres",
-                zarValue: 3500000,
-                score: 90,
-                stage: "Qualified",
-                notes: "Targeting Energy, Water & Sustainability division for water saving & cooling tower treatment rollout.",
-                updatedAt: new Date().toISOString()
-            };
-            push(leadsRef, brollLead);
-            switchTab('pipeline');
-        };
-
-        function renderLeads(leads) {
-            const tbody = document.getElementById('leads-table-body');
-            tbody.innerHTML = '';
-            
-            const entries = Object.entries(leads);
-            if (entries.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500">No opportunities found. Click "New Lead" or load Broll from the Knowledge Base.</td></tr>`;
-                return;
-            }
-
-            entries.reverse().forEach(([id, lead]) => {
-                const stageColors = {
-                    'Prospecting': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-                    'Qualified': 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-                    'Quoted': 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
-                    'Closed Won': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                };
-                const stageClass = stageColors[lead.stage] || 'bg-slate-800 text-slate-300';
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-900/60 transition-colors";
-                tr.innerHTML = `
-                    <td class="p-4">
-                        <div class="font-bold text-white">${escapeHtml(lead.company)}</div>
-                        <div class="text-xs text-slate-400">${escapeHtml(lead.contact || 'No contact')}</div>
-                    </td>
-                    <td class="p-4">
-                        <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700">${escapeHtml(lead.category || 'General')}</span>
-                    </td>
-                    <td class="p-4 text-slate-300 font-mono text-xs">${escapeHtml(lead.capacity || 'N/A')}</td>
-                    <td class="p-4 font-mono text-emerald-400 font-semibold">R ${Number(lead.zarValue || 0).toLocaleString()}</td>
-                    <td class="p-4">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-amber-400">${lead.score || 0}</span>
-                            <div class="w-16 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                <div class="bg-amber-400 h-full" style="width: ${lead.score || 0}%"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <span class="text-xs px-2.5 py-1 rounded-full border font-medium ${stageClass}">${lead.stage}</span>
-                    </td>
-                    <td class="p-4 text-right space-x-2">
-                        <button onclick="editLead('${id}')" class="text-slate-400 hover:text-cyan-400 p-1.5 transition-colors" title="Edit Lead"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteLead('${id}')" class="text-slate-400 hover:text-red-400 p-1.5 transition-colors" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateMetrics(leads) {
-            let totalVal = 0;
-            let weightedVal = 0;
-            let totalScore = 0;
-            let count = 0;
-
-            const stageWeights = {
-                'Prospecting': 0.2,
-                'Qualified': 0.5,
-                'Quoted': 0.8,
-                'Closed Won': 1.0
-            };
-
-            Object.values(leads).forEach(lead => {
-                const val = parseFloat(lead.zarValue) || 0;
-                const score = parseInt(lead.score) || 0;
-                const weight = stageWeights[lead.stage] || 0.2;
-
-                totalVal += val;
-                weightedVal += (val * weight);
-                totalScore += score;
-                count++;
-            });
-
-            document.getElementById('metric-total-value').innerText = `R ${totalVal.toLocaleString()}`;
-            document.getElementById('metric-weighted-value').innerText = `R ${Math.round(weightedVal).toLocaleString()}`;
-            document.getElementById('metric-avg-score').innerText = count > 0 ? `${Math.round(totalScore / count)} / 100` : `0 / 100`;
-            document.getElementById('metric-total-count').innerText = count;
-        }
-
-        window.filterLeads = function() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const filtered = {};
-            Object.entries(allLeads).forEach(([id, lead]) => {
-                if ((lead.company && lead.company.toLowerCase().includes(query)) ||
-                    (lead.category && lead.category.toLowerCase().includes(query)) ||
-                    (lead.stage && lead.stage.toLowerCase().includes(query))) {
-                    filtered[id] = lead;
-                }
-            });
-            renderLeads(filtered);
-        };
-
-        window.switchTab = function(tabName) {
-            if (tabName === 'pipeline') {
-                document.getElementById('section-pipeline').classList.remove('hidden');
-                document.getElementById('section-knowledge').classList.add('hidden');
-                document.getElementById('tab-pipeline').className = "pb-3 border-b-2 border-cyan-500 text-cyan-400 font-semibold text-sm flex items-center gap-2 transition-all";
-                document.getElementById('tab-knowledge').className = "pb-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-semibold text-sm flex items-center gap-2 transition-all";
-            } else {
-                document.getElementById('section-pipeline').classList.add('hidden');
-                document.getElementById('section-knowledge').classList.remove('hidden');
-                document.getElementById('tab-knowledge').className = "pb-3 border-b-2 border-cyan-500 text-cyan-400 font-semibold text-sm flex items-center gap-2 transition-all";
-                document.getElementById('tab-pipeline').className = "pb-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-semibold text-sm flex items-center gap-2 transition-all";
-            }
-        };
-
-        function escapeHtml(str) {
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-    </script>
-</body>
-</html>
