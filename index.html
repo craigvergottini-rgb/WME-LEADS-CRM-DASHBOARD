@@ -475,6 +475,9 @@
                             <option value="High Municipal Tariffs & Water Shedding">High Municipal Tariffs & Water Shedding</option>
                             <option value="Greywater Reuse & Estate Irrigation">Greywater Reuse & Estate Irrigation</option>
                             <option value="Thickener Overflow & Process Water Clarification">Thickener Overflow & Process Water Clarification</option>
+                            <option value="Slimes Dam Decant & Ultrafine Chromite Fines">Slimes Dam Decant & Ultrafine Chromite Fines</option>
+                            <option value="Acid Mine Drainage & High Sulphates">Acid Mine Drainage & High Sulphates</option>
+                            <option value="Surface Water River Intake Turbidity & Algae">Surface Water River Intake Turbidity & Algae</option>
                         </select>
                     </div>
                     <div>
@@ -799,10 +802,19 @@
                 return matchesSearch && matchesCat;
             });
 
+            const issueOptions = [
+                "High Municipal Tariffs & Water Shedding",
+                "Greywater Reuse & Estate Irrigation",
+                "Thickener Overflow & Process Water Clarification",
+                "Slimes Dam Decant & Ultrafine Chromite Fines",
+                "Acid Mine Drainage & High Sulphates",
+                "Surface Water River Intake Turbidity & Algae"
+            ];
+
             tbody.innerHTML = filtered.map(l => {
                 const qual = l.qualification || 'New lead';
                 const proc = l.processStatus || 'In process';
-                const issueText = l.issue || 'N/A';
+                const issueText = l.issue || 'High Municipal Tariffs & Water Shedding';
                 const key = l.firebaseKey || l.id;
                 return `
                 <tr class="hover:bg-slate-50 border-b border-slate-200">
@@ -822,9 +834,9 @@
                     <td class="p-3 font-bold text-slate-800">R${(l.value || 0).toLocaleString()}</td>
                     <td class="p-3 font-bold ${l.score >= 80 ? 'text-amber-600' : 'text-slate-600'}">${l.score}/100</td>
                     <td class="p-3">
-                        <span class="inline-block bg-slate-100 text-slate-800 text-xs px-2.5 py-1 rounded-md border border-slate-200 font-medium">
-                            ${issueText}
-                        </span>
+                        <select onchange="updateIssue('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium text-slate-800 max-w-[200px] truncate">
+                            ${issueOptions.map(opt => `<option value="${opt}" ${issueText === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                        </select>
                     </td>
                     <td class="p-3">
                         <select onchange="updateStage('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium">
@@ -1044,6 +1056,11 @@
             if (lead && lead.firebaseKey) update(ref(db, `leads/${lead.firebaseKey}`), { processStatus: newStatus });
         };
 
+        window.updateIssue = function(key, newIssue) {
+            const lead = leads.find(l => l.firebaseKey === key || l.id == key);
+            if (lead && lead.firebaseKey) update(ref(db, `leads/${lead.firebaseKey}`), { issue: newIssue });
+        };
+
         window.deleteLead = function(key) {
             const lead = leads.find(l => l.firebaseKey === key || l.id == key);
             if (lead && lead.firebaseKey && confirm("Delete this lead?")) remove(ref(db, `leads/${lead.firebaseKey}`));
@@ -1116,8 +1133,8 @@
         };
 
         window.exportToCSV = function() {
-            let csv = 'Company,Contact,Phone,Category,Volume,Value,Stage,Qualification,Status\n';
-            leads.forEach(l => csv += `"${l.company}","${l.contact}","${l.phone}","${l.category}",${l.volume},${l.value},"${l.stage}","${l.qualification || 'New lead'}","${l.processStatus || 'In process'}"\n`);
+            let csv = 'Company,Contact,Phone,Category,Volume,Value,Stage,Qualification,Status,Primary Issue\n';
+            leads.forEach(l => csv += `"${l.company}","${l.contact}","${l.phone}","${l.category}",${l.volume},${l.value},"${l.stage}","${l.qualification || 'New lead'}","${l.processStatus || 'In process'}","${l.issue || ''}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = window.URL.createObjectURL(blob);
