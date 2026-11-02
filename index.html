@@ -67,6 +67,18 @@
                     </div>
                 </div>
                 <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Lead Qualification</label>
+                    <select id="edit-qualification" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
+                        <option value="New lead">New lead</option>
+                        <option value="Interested made contact (follow up)">Interested made contact (follow up)</option>
+                        <option value="E mail sent - follow up">E mail sent - follow up</option>
+                        <option value="In contract (revisit 1 year)">In contract (revisit 1 year)</option>
+                        <option value="Not interested">Not interested</option>
+                        <option value="Deal won">Deal won</option>
+                        <option value="Deal lost">Deal lost</option>
+                    </select>
+                </div>
+                <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
                     <input type="email" id="edit-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
                 </div>
@@ -98,21 +110,21 @@
             <form onsubmit="saveManualLead(event)" class="space-y-4 text-xs">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Company / Facility Name *</label>
-                    <input type="text" id="man-company" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Mediclinic Head Office">
+                    <input type="text" id="man-company" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Broll Property Group (EWS)">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Contact Person *</label>
-                        <input type="text" id="man-contact" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Infrastructure Manager">
+                        <input type="text" id="man-contact" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="e.g. Facilities Lead">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Phone Number</label>
-                        <input type="text" id="man-phone" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="021 809 6500">
+                        <input type="text" id="man-phone" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="011 441 4000">
                     </div>
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Email Address</label>
-                    <input type="email" id="man-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="petrus.swanepoel@mediclinic.co.za">
+                    <input type="email" id="man-email" class="w-full text-sm border border-slate-300 rounded-lg p-2.5" placeholder="ews@broll.com">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -439,7 +451,8 @@
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Primary Qualification Status</label>
                             <select id="form-qualification" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
                                 <option value="New lead">New lead</option>
-                                <option value="Interested made contact (follow up)" selected>Interested made contact (follow up)</option>
+                                <option value="Interested made contact (follow up)">Interested made contact (follow up)</option>
+                                <option value="E mail sent - follow up" selected>E mail sent - follow up</option>
                                 <option value="In contract (revisit 1 year)">In contract (revisit 1 year)</option>
                                 <option value="Not interested">Not interested</option>
                                 <option value="Deal won">Deal won</option>
@@ -495,9 +508,6 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <button onclick="openManualAddModal()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium py-2 px-3 rounded-lg flex items-center gap-1 shadow-sm">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Manual Lead
-                        </button>
-                        <button onclick="resetToDefaultLeads()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium py-2 px-3 rounded-lg flex items-center gap-1">
-                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Sample Data (14 Leads)
                         </button>
                         <button onclick="exportToCSV()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium py-2 px-4 rounded-lg flex items-center gap-2">
                             <i data-lucide="download" class="w-4 h-4"></i> Export to CSV
@@ -606,7 +616,7 @@
                     <button onclick="filterKBCategory('JobTitles')" class="kb-pill bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200">Decision-Makers</button>
                 </div>
 
-                <!-- Knowledge Base Cards Grid (All 6 Standard Cards Included) -->
+                <!-- Knowledge Base Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="kb-card-grid">
 
                     <!-- CARD 1: Balwin Properties -->
@@ -719,38 +729,10 @@
         let kbEntries = [];
         let categoryChart, pipelineChart;
 
-        // Exactly 14 Master Sample Leads (13 Enterprise Accounts + 1 Manual Lead)
-        const initialSampleLeads = [
-            { id: 1, company: "Balwin Properties (Balwin Green Living)", contact: "Steve Brookes (CEO) / Head of Infrastructure", email: "info@balwin.co.za", phone: "+27 (0)11 450 2818", category: "Greywater", volume: 1200, urgency: "Immediate (< 1 month)", issue: "Greywater Reuse & Estate Irrigation", notes: "Greywater recycling & MBR wastewater treatment plants for Mooikloof, The Reid & Greenlee estates", value: 7800000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 2, company: "Mediclinic head office", contact: "Petrus Swanepoel infrastructure Manager", email: "petrus.swanepoel@mediclinic.co.za", phone: "021 809 6500", category: "Greywater", volume: 450, urgency: "Immediate (< 1 month)", issue: "High Municipal Tariffs & Water Shedding", notes: "Head office infrastructure contact for corporate greywater and water security", value: 3250000, score: 91, stage: "Initial Contact", qualification: "Interested made contact (follow up)", processStatus: "In process" },
-            { id: 3, company: "Tharisa Minerals (Chrome Washplant)", contact: "Plant Metallurgist & Resident GCC Engineer", email: "enquiries@tharisa.com", phone: "+27 (0)11 996 3500", category: "Mining", volume: 3200, urgency: "Immediate (< 1 month)", issue: "Thickener Overflow & Process Water Clarification", notes: "High-capacity thickener overflow recycling for spiral and DMS washplant circuits", value: 11200000, score: 96, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 4, company: "Samancor Chrome (Tubatse Works)", contact: "General Manager & Processing Operations Lead", email: "info@samancorcr.com", phone: "+27 (0)11 245 1000", category: "Mining", volume: 4500, urgency: "1-3 Months", issue: "Slimes Dam Decant & Ultrafine Chromite Fines", notes: "Slimes dam water recovery and ultrafine chromite filtration system in Steelpoort", value: 15500000, score: 94, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 5, company: "Glencore Ferrochrome (Eastern Complex)", contact: "Metallurgical Manager & Water Infrastructure Director", email: "info@glencore.co.za", phone: "+27 (0)13 235 7000", category: "Mining", volume: 5000, urgency: "Immediate (< 1 month)", issue: "Acid Mine Drainage & High Sulphates", notes: "Closed-loop process water treatment and heavy metal precipitation for chrome smelting", value: 18000000, score: 97, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 6, company: "Hernic Ferrochrome (Brits Washplant)", contact: "Senior Plant Metallurgist & GCC Engineer", email: "info@hernic.co.za", phone: "+27 (0)12 252 8000", category: "Mining", volume: 2800, urgency: "1-3 Months", issue: "Thickener Overflow & Process Water Clarification", notes: "DMS washplant water clarification and tailings thickener optimisation", value: 9500000, score: 90, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 7, company: "Jubilee Metals Group (Dilokong Chrome)", contact: "Head of Tailings Retreatment & Operations", email: "info@jubileemetalsgroup.com", phone: "+27 (0)11 268 6555", category: "Mining", volume: 3800, urgency: "Immediate (< 1 month)", issue: "Slimes Dam Decant & Ultrafine Chromite Fines", notes: "Surface tailings retreatment and ultrafiltration water recirculation", value: 13200000, score: 93, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 8, company: "Sibanye-Stillwater (Westonaria Ops)", contact: "Dr. Richard Stewart (CEO) / Operational Technical Lead", email: "richard.stewart@sibanyestillwater.com", phone: "+27 (0)11 278 9600", category: "Mining", volume: 3500, urgency: "Immediate (< 1 month)", issue: "Acid Mine Drainage & High Sulphates", notes: "Underground dewatering & high-recovery neutralization plant", value: 12500000, score: 95, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 9, company: "Netcare Sunninghill Hospital", contact: "Hospital Management & Regional Facilities Engineer", email: "customer.care@netcare.co.za", phone: "+27 (0)11 806 1500", category: "Greywater", volume: 450, urgency: "Immediate (< 1 month)", issue: "Greywater Reuse & Estate Irrigation", notes: "SANS 241 & ISO 13959 high-purity medical RO for hemodialysis and backup", value: 2800000, score: 92, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 10, company: "Mall of Africa (Attacq Ltd)", contact: "Jackie van Niekerk (CEO) / Precinct Facilities Manager", email: "enquiries@attacq.co.za", phone: "+27 (0)10 596 1470", category: "Greywater", volume: 850, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "HVAC cooling tower makeup water, bio-fouling control and greywater harvesting", value: 4200000, score: 85, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 11, company: "Montecasino Complex (Tsogo Sun)", contact: "Director of Property Operations & Technical Infrastructure", email: "montecasino.contact@tsogosun.com", phone: "+27 (0)11 510 7000", category: "Greywater", volume: 650, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "Blackwater reclamation & greywater treatment for cooling towers and fountains", value: 3900000, score: 82, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 12, company: "Rand Water (Vaal Intake Operations)", contact: "Sipho Mosai (CEO) / Bulk Water Operations Director", email: "customerservice@randwater.co.za", phone: "+27 (0)11 682 0911", category: "Ground / Surface Water", volume: 15000, urgency: "Immediate (< 1 month)", issue: "Surface Water River Intake Turbidity & Algae", notes: "High-turbidity Vaal River surface water intake, PAC dosing, UF multi-barrier", value: 45000000, score: 98, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 13, company: "Heineken SA (Sedibeng Brewery)", contact: "Brewery Supply Chain Director & Plant Utilities Manager", email: "info.southafrica@heineken.com", phone: "+27 (0)86 044 8377", category: "Borehole", volume: 950, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "Industrial deep borehole brackish RO desalination & softening for boiler feed", value: 6200000, score: 87, stage: "New", qualification: "New lead", processStatus: "In process" },
-            { id: 14, company: "Broll Property Group (EWS Division)", contact: "Facilities & Utilities Management Lead", email: "ews@broll.com", phone: "+27 (0)11 441 4000", category: "Greywater", volume: 550, urgency: "1-3 Months", issue: "High Municipal Tariffs & Water Shedding", notes: "Commercial property portfolio water auditing and greywater recycling systems", value: 3600000, score: 89, stage: "Initial Contact", qualification: "Interested made contact (follow up)", processStatus: "In process" }
-        ];
-
-        // Realtime Listener for Pipeline Leads
         onValue(leadsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 leads = Object.entries(data).map(([firebaseKey, leadVal]) => ({ ...leadVal, firebaseKey }));
-            } else {
-                const localSaved = localStorage.getItem('wme_projects_master_leads_v12');
-                const seedData = localSaved ? JSON.parse(localSaved) : initialSampleLeads;
-                leads = [];
-                seedData.forEach(l => {
-                    const newRef = push(leadsRef);
-                    set(newRef, l);
-                    leads.push({ ...l, firebaseKey: newRef.key });
-                });
             }
             updateDashboardMetrics();
             renderLeadsTable();
@@ -758,7 +740,6 @@
             document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Sync Error`;
         });
 
-        // Realtime Listener for Knowledge Base Entries
         onValue(kbRef, (snapshot) => {
             const data = snapshot.val();
             kbEntries = data ? Object.entries(data).map(([firebaseKey, val]) => ({ ...val, firebaseKey })) : [];
@@ -772,17 +753,6 @@
             });
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
             document.getElementById(`tab-${tabId}`).classList.add('active-tab');
-        };
-
-        window.resetToDefaultLeads = function() {
-            if (confirm("Reset database back to the 14 official SA target leads (including Mediclinic, Balwin & Broll)?")) {
-                set(leadsRef, null).then(() => {
-                    initialSampleLeads.forEach(l => {
-                        const newRef = push(leadsRef);
-                        set(newRef, l);
-                    });
-                });
-            }
         };
 
         window.submitNewLead = function(e) {
@@ -868,6 +838,7 @@
                     <td class="p-3">
                         <select onchange="updateQualification('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
                             qual === 'New lead' ? 'text-blue-700 bg-blue-50 border-blue-200' :
+                            qual === 'E mail sent - follow up' ? 'text-purple-700 bg-purple-50 border-purple-200' :
                             qual === 'Deal won' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
                             qual === 'Deal lost' ? 'text-rose-700 bg-rose-50 border-rose-200' :
                             qual === 'Not interested' ? 'text-slate-500 bg-slate-100 border-slate-200' :
@@ -876,6 +847,7 @@
                         }">
                             <option value="New lead" ${qual === 'New lead' ? 'selected' : ''}>New lead</option>
                             <option value="Interested made contact (follow up)" ${qual === 'Interested made contact (follow up)' ? 'selected' : ''}>Interested made contact (follow up)</option>
+                            <option value="E mail sent - follow up" ${qual === 'E mail sent - follow up' ? 'selected' : ''}>E mail sent - follow up</option>
                             <option value="In contract (revisit 1 year)" ${qual === 'In contract (revisit 1 year)' ? 'selected' : ''}>In contract (revisit 1 year)</option>
                             <option value="Not interested" ${qual === 'Not interested' ? 'selected' : ''}>Not interested</option>
                             <option value="Deal won" ${qual === 'Deal won' ? 'selected' : ''}>Deal won</option>
@@ -918,6 +890,7 @@
             document.getElementById('edit-volume').value = lead.volume || 100;
             document.getElementById('edit-value').value = lead.value || 500000;
             document.getElementById('edit-score').value = lead.score || 75;
+            document.getElementById('edit-qualification').value = lead.qualification || 'New lead';
             document.getElementById('edit-email').value = lead.email || '';
             document.getElementById('edit-phone').value = lead.phone || '';
             document.getElementById('edit-contact-modal').classList.remove('hidden');
@@ -940,6 +913,7 @@
                     volume: parseFloat(document.getElementById('edit-volume').value) || 0,
                     value: parseFloat(document.getElementById('edit-value').value) || 0,
                     score: parseInt(document.getElementById('edit-score').value) || 50,
+                    qualification: document.getElementById('edit-qualification').value,
                     email: document.getElementById('edit-email').value,
                     phone: document.getElementById('edit-phone').value
                 });
@@ -981,7 +955,7 @@
                 category,
                 volume,
                 urgency: '1-3 Months',
-                qualification: 'Interested made contact (follow up)',
+                qualification: 'E mail sent - follow up',
                 processStatus: 'In process',
                 issue,
                 notes: 'Manually added lead',
@@ -1110,7 +1084,7 @@
                 category: item.cat,
                 volume: item.vol,
                 urgency: "1-3 Months",
-                qualification: "Interested made contact (follow up)",
+                qualification: "E mail sent - follow up",
                 processStatus: "In process",
                 issue: item.issue,
                 notes: "Scraped via Prospector Engine",
@@ -1142,8 +1116,8 @@
         };
 
         window.exportToCSV = function() {
-            let csv = 'Company,Contact,Phone,Category,Volume,Value,Stage\n';
-            leads.forEach(l => csv += `"${l.company}","${l.contact}","${l.phone}","${l.category}",${l.volume},${l.value},"${l.stage}"\n`);
+            let csv = 'Company,Contact,Phone,Category,Volume,Value,Stage,Qualification,Status\n';
+            leads.forEach(l => csv += `"${l.company}","${l.contact}","${l.phone}","${l.category}",${l.volume},${l.value},"${l.stage}","${l.qualification || 'New lead'}","${l.processStatus || 'In process'}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = window.URL.createObjectURL(blob);
