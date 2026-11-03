@@ -72,6 +72,7 @@
                         <option value="New lead">New lead</option>
                         <option value="Interested made contact (follow up)">Interested made contact (follow up)</option>
                         <option value="E mail sent - follow up">E mail sent - follow up</option>
+                        <option value="Meeting set">Meeting set</option>
                         <option value="In contract (revisit 1 year)">In contract (revisit 1 year)</option>
                         <option value="Not interested">Not interested</option>
                         <option value="Deal won">Deal won</option>
@@ -452,7 +453,8 @@
                             <select id="form-qualification" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
                                 <option value="New lead">New lead</option>
                                 <option value="Interested made contact (follow up)">Interested made contact (follow up)</option>
-                                <option value="E mail sent - follow up" selected>E mail sent - follow up</option>
+                                <option value="E mail sent - follow up">E mail sent - follow up</option>
+                                <option value="Meeting set" selected>Meeting set</option>
                                 <option value="In contract (revisit 1 year)">In contract (revisit 1 year)</option>
                                 <option value="Not interested">Not interested</option>
                                 <option value="Deal won">Deal won</option>
@@ -851,6 +853,7 @@
                         <select onchange="updateQualification('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium ${
                             qual === 'New lead' ? 'text-blue-700 bg-blue-50 border-blue-200' :
                             qual === 'E mail sent - follow up' ? 'text-purple-700 bg-purple-50 border-purple-200' :
+                            qual === 'Meeting set' ? 'text-emerald-800 bg-emerald-100 border-emerald-300 font-bold' :
                             qual === 'Deal won' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
                             qual === 'Deal lost' ? 'text-rose-700 bg-rose-50 border-rose-200' :
                             qual === 'Not interested' ? 'text-slate-500 bg-slate-100 border-slate-200' :
@@ -860,6 +863,7 @@
                             <option value="New lead" ${qual === 'New lead' ? 'selected' : ''}>New lead</option>
                             <option value="Interested made contact (follow up)" ${qual === 'Interested made contact (follow up)' ? 'selected' : ''}>Interested made contact (follow up)</option>
                             <option value="E mail sent - follow up" ${qual === 'E mail sent - follow up' ? 'selected' : ''}>E mail sent - follow up</option>
+                            <option value="Meeting set" ${qual === 'Meeting set' ? 'selected' : ''}>Meeting set</option>
                             <option value="In contract (revisit 1 year)" ${qual === 'In contract (revisit 1 year)' ? 'selected' : ''}>In contract (revisit 1 year)</option>
                             <option value="Not interested" ${qual === 'Not interested' ? 'selected' : ''}>Not interested</option>
                             <option value="Deal won" ${qual === 'Deal won' ? 'selected' : ''}>Deal won</option>
@@ -967,7 +971,7 @@
                 category,
                 volume,
                 urgency: '1-3 Months',
-                qualification: 'E mail sent - follow up',
+                qualification: 'Meeting set',
                 processStatus: 'In process',
                 issue,
                 notes: 'Manually added lead',
@@ -1101,7 +1105,7 @@
                 category: item.cat,
                 volume: item.vol,
                 urgency: "1-3 Months",
-                qualification: "E mail sent - follow up",
+                qualification: "Meeting set",
                 processStatus: "In process",
                 issue: item.issue,
                 notes: "Scraped via Prospector Engine",
