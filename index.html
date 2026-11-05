@@ -148,6 +148,7 @@
                         <select id="man-stage" class="w-full text-sm border border-slate-300 rounded-lg p-2.5">
                             <option value="New">New</option>
                             <option value="Initial Contact" selected>Initial Contact</option>
+                            <option value="Send CP - Set meeting">Send CP - Set meeting</option>
                             <option value="Qualified Lead">Qualified Lead</option>
                             <option value="Proposal Sent">Proposal Sent</option>
                             <option value="Closed Won">Closed Won</option>
@@ -454,7 +455,7 @@
                                 <option value="New lead">New lead</option>
                                 <option value="Interested made contact (follow up)">Interested made contact (follow up)</option>
                                 <option value="E mail sent - follow up">E mail sent - follow up</option>
-                                <option value="Meeting set" selected>Meeting set</option>
+                                <option value="Meeting set">Meeting set</option>
                                 <option value="In contract (revisit 1 year)">In contract (revisit 1 year)</option>
                                 <option value="Not interested">Not interested</option>
                                 <option value="Deal won">Deal won</option>
@@ -816,6 +817,7 @@
             tbody.innerHTML = filtered.map(l => {
                 const qual = l.qualification || 'New lead';
                 const proc = l.processStatus || 'In process';
+                const stageVal = l.stage || 'New';
                 const issueText = l.issue || 'High Municipal Tariffs & Water Shedding';
                 const key = l.firebaseKey || l.id;
                 return `
@@ -842,11 +844,12 @@
                     </td>
                     <td class="p-3">
                         <select onchange="updateStage('${key}', this.value)" class="text-xs border border-slate-300 rounded p-1.5 bg-white font-medium">
-                            <option value="New" ${l.stage === 'New' ? 'selected' : ''}>New</option>
-                            <option value="Initial Contact" ${l.stage === 'Initial Contact' ? 'selected' : ''}>Initial Contact</option>
-                            <option value="Qualified Lead" ${l.stage === 'Qualified Lead' ? 'selected' : ''}>Qualified Lead</option>
-                            <option value="Proposal Sent" ${l.stage === 'Proposal Sent' ? 'selected' : ''}>Proposal Sent</option>
-                            <option value="Closed Won" ${l.stage === 'Closed Won' ? 'selected' : ''}>Closed Won</option>
+                            <option value="New" ${stageVal === 'New' ? 'selected' : ''}>New</option>
+                            <option value="Initial Contact" ${stageVal === 'Initial Contact' ? 'selected' : ''}>Initial Contact</option>
+                            <option value="Send CP - Set meeting" ${stageVal === 'Send CP - Set meeting' ? 'selected' : ''}>Send CP - Set meeting</option>
+                            <option value="Qualified Lead" ${stageVal === 'Qualified Lead' ? 'selected' : ''}>Qualified Lead</option>
+                            <option value="Proposal Sent" ${stageVal === 'Proposal Sent' ? 'selected' : ''}>Proposal Sent</option>
+                            <option value="Closed Won" ${stageVal === 'Closed Won' ? 'selected' : ''}>Closed Won</option>
                         </select>
                     </td>
                     <td class="p-3">
@@ -1138,7 +1141,7 @@
 
         window.exportToCSV = function() {
             let csv = 'Company,Contact,Phone,Category,Volume,Value,Stage,Qualification,Status,Primary Issue\n';
-            leads.forEach(l => csv += `"${l.company}","${l.contact}","${l.phone}","${l.category}",${l.volume},${l.value},"${l.stage}","${l.qualification || 'New lead'}","${l.processStatus || 'In process'}","${l.issue || ''}"\n`);
+            leads.forEach(l => csv += `"${l.company}","${l.contact}","${l.phone}","${l.category}",${l.volume},${l.value},"${l.stage || 'New'}","${l.qualification || 'New lead'}","${l.processStatus || 'In process'}","${l.issue || ''}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = window.URL.createObjectURL(blob);
@@ -1195,8 +1198,8 @@
             }
 
             if (pipelineChart) {
-                const stages = ['New', 'Initial Contact', 'Qualified Lead', 'Proposal Sent', 'Closed Won'];
-                pipelineChart.data.datasets[0].data = stages.map(st => leads.filter(l => l.stage === st).reduce((acc, l) => acc + (l.value || 0), 0));
+                const stages = ['New', 'Initial Contact', 'Send CP - Set meeting', 'Qualified Lead', 'Proposal Sent', 'Closed Won'];
+                pipelineChart.data.datasets[0].data = stages.map(st => leads.filter(l => (l.stage || 'New') === st).reduce((acc, l) => acc + (l.value || 0), 0));
                 pipelineChart.update();
             }
         }
@@ -1228,8 +1231,8 @@
                 pipelineChart = new Chart(ctxPipe, {
                     type: 'bar',
                     data: {
-                        labels: ['New', 'Initial Contact', 'Qualified Lead', 'Proposal Sent', 'Closed Won'],
-                        datasets: [{ data: [0,0,0,0,0], backgroundColor: '#0284c7' }]
+                        labels: ['New', 'Initial Contact', 'Send CP - Set meeting', 'Qualified Lead', 'Proposal Sent', 'Closed Won'],
+                        datasets: [{ data: [0,0,0,0,0,0], backgroundColor: '#0284c7' }]
                     },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
